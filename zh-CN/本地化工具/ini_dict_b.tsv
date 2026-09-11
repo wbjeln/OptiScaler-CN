@@ -1,0 +1,94 @@
+﻿# OptiScaler.ini 注释汉化词典 B（接 A）
+Try to force Dynamic MFG in game's native DLSSG. Requires Nvidia Blackwell or any AMD/Intel (Nvngx FG)	尝试在游戏原生 DLSSG 中强制启用动态 MFG。需要 Nvidia Blackwell 或任意 AMD/Intel 显卡（Nvngx FG）
+Tuning Set B	调优集 B
+Tuning set A	调优集 A
+Ultra Performance : 3.0	超级性能 : 3.0
+Ultra Quality : 1.3	超级质量 : 1.3
+Updates the DirectX 12 Agility SDK	更新 DirectX 12 Agility SDK
+Use HDR10	使用 HDR10
+Use High Quality Font for Menu	为菜单使用高质量字体
+Use a fixed value for LOD bias	为 LOD 偏置使用固定值
+Use fakenvapi when nvapi64.dll is missing.	当缺少 nvapi64.dll 时使用 fakenvapi。
+Use generic appid with NGX, fixes OptiScaler preset override not working with certain games	对 NGX 使用通用 appid，修复 OptiScaler 预设覆盖在部分游戏中失效的问题
+Use manual input polling instead of hooking WndProc	使用手动输入轮询而非挂钩 WndProc
+Use override value as scale multiplier	将覆盖值用作缩放乘数
+Use precompiled shaders for RCAS, Output Scaling and Mask Bias	为 RCAS、输出缩放和遮罩偏置使用预编译着色器
+Use raw DLSS reactive mask as transparency mask	将原始 DLSS 反应遮罩用作透明度遮罩
+Useful for games using bindless	对使用 bindless 的游戏有用
+Usually allows for using Fakenvapi without spoofing the whole game, and sometimes DLSS/DLSSG	通常允许在不伪装整个游戏的情况下使用 Fakenvapi，有时也适用于 DLSS/DLSSG
+Value of 0.0f can improve temporal stability of bright pixels.	取值为 0.0f 可提升亮色像素的时域稳定性。
+Values between MotionThreshold and this value will use be used to scale sharpness value	介于 MotionThreshold 与此值之间的数值将用于缩放锐化强度
+VendorID to spoof	要伪装的 VendorID
+Verbosity level of file logs	文件日志的详细级别
+When non-zero, you won't be able to manually adjust the FG multiplier	非零时，将无法手动调整 FG 倍率
+When set to false creates a new log file for every OptiScaler session	设为 false 时，每次 OptiScaler 会话都会创建新的日志文件
+When using Luma mod and this will be enabled	使用 Luma MOD 且此项启用时
+Will slow down the loading of the game	会拖慢游戏加载速度
+Will use more VRAM but needed for Uniscaler	会占用更多显存，但 Uniscaler 需要
+XeFG DepthInverted flag	XeFG DepthInverted 标志
+XeFG HighResMV flag	XeFG HighResMV 标志
+XeFG JitteredMV flag	XeFG JitteredMV 标志
+You MUST copy D3D12_OptiScaler folder into the OptiScaler folder!	必须将 D3D12_OptiScaler 文件夹复制到 OptiScaler 文件夹中！
+You can also specify a custom *path* for the log	也可以为日志指定自定义*路径*
+add fAccumulationAddedPerFrame starting at frame N+2.	从第 N+2 帧开始增加 fAccumulationAddedPerFrame。
+along with reducing CPU overhead when used with	同时在与以下项同用时降低 CPU 开销：
+amd_fidelityfx_denoiser_dx12.dll	amd_fidelityfx_denoiser_dx12.dll（FSR 光线重建降噪器）
+amd_fidelityfx_dx12.dll or amd_fidelityfx_loader_dx12.dll	amd_fidelityfx_dx12.dll 或 amd_fidelityfx_loader_dx12.dll（FSR 主库 / 加载器）
+amd_fidelityfx_framegeneration_dx12.dll	amd_fidelityfx_framegeneration_dx12.dll（FSR 帧生成）
+amd_fidelityfx_radiancecache_dx12.dll	amd_fidelityfx_radiancecache_dx12.dll（FSR 辐射缓存）
+amd_fidelityfx_upscaler_dx12.dll	amd_fidelityfx_upscaler_dx12.dll（FSR 超分）
+amd_fidelityfx_vk.dll	amd_fidelityfx_vk.dll（FSR Vulkan 版）
+and a bit more performant and possibly less compatible	性能稍好，但兼容性可能较差
+crashpad_handler.exe and others - listed in Config.h under ProcessFilter	crashpad_handler.exe 及其他 - 列于 Config.h 的 ProcessFilter 中
+dlssg          - requires streamline dlls inside 'OptiScaler/streamline' folder + nvngx_dlssg.dll	dlssg          - 需要 'OptiScaler/streamline' 文件夹内的 streamline dll 以及 nvngx_dlssg.dll
+dlssg    - Can be used with any FG Output. Supports Hudless out of the box. Limited to games that use Streamline and DLSSG	dlssg    - 可与任意 FG 输出同用。开箱即支持无 HUD 图像。仅适用于使用 Streamline 和 DLSSG 的游戏
+fakenvapi replaces nvapi calls allowing for features like AntiLag 2 or XeLL to replace Reflex	fakenvapi 替换 nvapi 调用，使 AntiLag 2 或 XeLL 等功能可以替代 Reflex
+float - Default (auto) is 0.0 (disabled)	float - 默认（auto）为 0.0（禁用）
+float - Default (auto) is 0.01	float - 默认（auto）为 0.01
+float - Default (auto) is 10000.0	float - 默认（auto）为 10000.0
+float - Default (auto) is 14.0	float - 默认（auto）为 14.0
+float - Default (auto) is 15.0	float - 默认（auto）为 15.0
+fsr21 (native VK), fsr22 (native VK), ffx (native FSR 2.3; 3.1), xess (native VK), fsr21_12 (VKon12), ffx_12 (FSR 2.3; 3.1; 4.x), dlss - Default (auto) is fsr22	fsr21（原生 VK）、fsr22（原生 VK）、ffx（原生 FSR 2.3; 3.1）、xess（原生 VK）、fsr21_12（VKon12）、ffx_12（FSR 2.3; 3.1; 4.x）、dlss - 默认（auto）为 fsr22
+fsr22 (native DX11), fsr31 (native DX11), xess (native DX11, Arc only), xess_12 (dx11on12), fsr21_12 (dx11on12), fsr22_12 (dx11on12), ffx_12 (FSR 2.3; 3.1; 4.x), dlss - Default (auto) is fsr22	fsr22（原生 DX11）、fsr31（原生 DX11）、xess（原生 DX11，仅 Arc）、xess_12（dx11on12）、fsr21_12（dx11on12）、fsr22_12（dx11on12）、ffx_12（FSR 2.3; 3.1; 4.x）、dlss - 默认（auto）为 fsr22
+fsrfg          - requires amd_fidelityfx_dx12.dll OR amd_fidelityfx_loader_dx12.dll + amd_fidelityfx_framegeneration_dx12.dll	fsrfg          - 需要 amd_fidelityfx_dx12.dll 或 amd_fidelityfx_loader_dx12.dll + amd_fidelityfx_framegeneration_dx12.dll
+fsrfg    - Can be used with any FG Output. Supports Hudless out of the box.	fsrfg    - 可与任意 FG 输出同用。开箱即支持无 HUD 图像。
+fsrfg30  - Can be used with any FG Output. Supports Hudless out of the box.	fsrfg30  - 可与任意 FG 输出同用。开箱即支持无 HUD 图像。
+games create but not use FSR-FG swapchain (Silent Hill f)	游戏创建了 FSR-FG 交换链但并未使用（《寂静岭 f》）
+https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/54fbaafdc34716811751bea5032700e78f5a0f33/ffx-api/include/ffx_api/ffx_api_types.h#L197
+https://learn.microsoft.com/en-us/windows/win32/api/d3d12/ne-d3d12-d3d12_resource_states
+https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+integer value - Default (auto) is whole screen	整数值 - 默认（auto）为整屏
+integer value above > 0 - Default (auto) is 1	大于 0 的整数值 - 默认（auto）为 1
+libxell.dll	libxell.dll（XeLL 低延迟库）
+libxess.dll	libxess.dll（XeSS 超分核心库）
+libxess_dx11.dll	libxess_dx11.dll（XeSS DX11 版）
+libxess_fg.dll	libxess_fg.dll（XeSS 帧生成库）
+method names seperated with pipe "|" - Default (auto) is disabled	方法名以竖线 "|" 分隔 - 默认（auto）为禁用
+n is integer number  - Default (auto) is disabled	n 为整数 - 默认（auto）为禁用
+nofg, dlssg, nvngxfg, fsrfg, upscaler, fsrfg30 - Default (auto) is nofg	nofg、dlssg、nvngxfg、fsrfg、upscaler、fsrfg30 - 默认（auto）为 nofg
+nofg, fsrfg, xefg, dlssg - Default (auto) is nofg	nofg、fsrfg、xefg、dlssg - 默认（auto）为 nofg
+nvapi64.dll or fakenvapi.dll	nvapi64.dll 或 fakenvapi.dll
+nvngx.dll or _nvngx.dll	nvngx.dll 或 _nvngx.dll
+nvngx_dlss.dll	nvngx_dlss.dll（DLSS 核心库）
+nvngxfg  - Limited to FSR 3 FG (MFG with DLSS Enabler's dll). Requires DLSSG in the game. Supports Hudless out of the box. Uses Streamline swapchain for pacing.	nvngxfg  - 仅限 FSR 3 FG（配合 DLSS Enabler 的 dll 实现 MFG）。需要游戏内启用 DLSSG。开箱即支持无 HUD 图像。使用 Streamline 交换链进行帧节奏控制。
+or IQ issues when exclusive fullscreen mode is	或独占全屏模式下的画质问题时
+rcas, da or lcda - Default (auto) is rcas	rcas、da 或 lcda - 默认（auto）为 rcas
+received from FSR2/3 or FFX inputs	从 FSR2/3 或 FFX 输入接收的
+should be 0, when this option enabled	启用此选项时应为 0
+should be in state COMMON, when this option enabled	启用此选项时应处于 COMMON 状态
+smaller than diplay resolution	小于显示分辨率
+state and add resource barrier for correct state	状态，并添加资源屏障以确保状态正确
+string value - Default (auto) is 32.0.15.9155 (For Nvidia)	字符串值 - 默认（auto）为 32.0.15.9155（适用于 Nvidia）
+to prevent flickers and other issues	以防止闪烁及其他问题
+to set SpecialK's working mode, otherwise it will not be activated	用于设置 SpecialK 的工作模式，否则它不会被激活
+uint - Default (auto) is 2	uint - 默认（auto）为 2
+until index reaches 0	直到索引达到 0
+upscaler - Upscaler must be enabled. Can be used with any FG Output, but might be imperfect with some. To prevent UI glitching, Hudfix is required	upscaler - 必须启用超分。可与任意 FG 输出同用，但在部分情况下可能不够完美。为防止 UI 故障，需要启用 Hudfix
+value range between -1.3 and 1.3 - Default (auto) is 0.4	取值范围 -1.3 至 1.3 - 默认（auto）为 0.4
+value range between 0.0 and 1.0 (while using upper limit is RCAS 1.3) - Default (auto) is 0.3	取值范围 0.0 至 1.0（用到上限时为 RCAS 1.3） - 默认（auto）为 0.3
+when skipping ResizeBuffers call	在跳过 ResizeBuffers 调用时
+with Intel cards when spoofing enabled	在启用伪装时对 Intel 显卡
+without this option OptiScaler will disable all FG features	若不启用此选项，OptiScaler 将禁用所有 FG 功能
+xefg           - requires libxess_fg.dll and libxell.dll	xefg           - 需要 libxess_fg.dll 和 libxell.dll
+xess, fsr21, fsr22, ffx (FSR 2.3; 3.1; 4.x), dlss
+you could try setting "Tuning Set B" to recover lost FPS at cost of a bit higher variance.	你可以尝试设置 "Tuning Set B" 来挽回损失的帧数，代价是方差略微升高。
