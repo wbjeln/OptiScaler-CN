@@ -16,7 +16,7 @@ FSR 输入替换成其它超分方案，并提供帧生成（FG）、锐化、GP
   —— 中文字体（思源黑体子集）已经内嵌进 DLL，不需要额外安装或放置字体文件
 · OptiScaler.ini 的注释全部汉化
   —— 键名与取值保持和官方完全一致，因此本配置文件和官方版可以通用
-· setup_windows.bat 安装脚本的交互提示汉化
+· setup_windows.bat / setup_linux.sh 安装脚本的交互提示汉化
 · 其余功能、参数、行为与官方版本完全一致
 
 三、怎么安装（重要，请先读完）
@@ -43,9 +43,10 @@ FSR 输入替换成其它超分方案，并提供帧生成（FG）、锐化、GP
 四、常见问题
 --------------------------------------------------------------------------------
 Q：菜单里的中文显示成方块（豆腐块）？
-A：说明中文字体没有加载。本包默认启用高质量字体，请不要把 OptiScaler.ini
-   里的 UseHQFont 改成 false。如果你自己指定了 TTFFontPath 使用别的字体，
-   也建议把它删掉、改用默认字体。
+A：本包已把中文字体内嵌进 DLL，正常情况下不会出现方块，UseHQFont 无论
+   设为 true 还是 false 都能正常显示中文。若仍然出现方块，多半是你在
+   OptiScaler.ini 里用 TTFFontPath 指定了别的字体——把它改回默认
+   （或删掉那一行）即可。
 
 Q：游戏一启动就崩溃 / 进不去？
 A：绝大多数情况是注入文件名选错了。换一个文件名再试，通常
@@ -66,7 +67,7 @@ A：请查阅【文档】文件夹里的《配置说明》，其中逐条解释�
   OptiScaler.dll          主程序（汉化版）。安装脚本会把它改名成 dxgi.dll 等
   OptiScaler.ini          配置文件（注释已汉化）
   setup_windows.bat       安装脚本（提示已汉化，安装完成后会自我删除）
-  setup_linux.sh          Linux / Steam Deck 安装脚本
+  setup_linux.sh          Linux / Steam Deck 安装脚本（提示已汉化）
   Remove_OptiScaler.bat   卸载脚本（由安装脚本自动生成）
   OptiScaler\             运行时需要的第三方组件（XeSS、FidelityFX 等）
   Licenses\               第三方组件的授权文本，请勿删除

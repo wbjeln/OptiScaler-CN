@@ -7805,11 +7805,16 @@ void MenuCommon::Init(HWND InHwnd, bool isUWP)
         // 未启用高质量字体时，ImGui 会退回内置的 ProggyClean（仅含 ASCII 字形），
         // 中文界面会整片显示为方块。此时直接把内置的思源黑体子集作为默认字体加载，
         // 保证关闭 UseHQFont 的用户也能正常看到中文。
+        // 注：此处刻意不改动 fontSize，保持与上游 UseHQFont=false 时完全一致的排版，
+        //     唯一区别就是默认字体由内置 ASCII 字体换成了思源黑体子集，从而能显示中文。
+        io.Fonts->Clear();
+
         ImFontConfig cjkOnlyConfig;
+        // noto_sc_font 是静态数组，必须声明数据不由图集释放，否则会释放静态内存导致崩溃
         cjkOnlyConfig.FontDataOwnedByAtlas = false;
 
-        io.FontDefault = atlas->AddFontFromMemoryTTF((void*) noto_sc_font, (int) noto_sc_font_size, fontSize,
-                                                     &cjkOnlyConfig, (const ImWchar*) noto_sc_glyph_ranges);
+        io.FontDefault = io.Fonts->AddFontFromMemoryTTF((void*) noto_sc_font, (int) noto_sc_font_size, fontSize,
+                                                        &cjkOnlyConfig, (const ImWchar*) noto_sc_glyph_ranges);
         LOG_INFO("HQ font disabled, Chinese font loaded as default: {0}", io.FontDefault != nullptr);
     }
 

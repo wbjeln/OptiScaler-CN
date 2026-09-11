@@ -29,6 +29,8 @@ OptiScaler 使用 GNU General Public License v3.0（GPLv3）授权发布。
    · 修改文件：OptiScaler/menu/menu_common.cpp
      在字体图集里把中文字体以 Merge（合并）方式追加到原有字体之后，
      拉丁字符仍由原版 Hack 字体渲染，汉字由思源黑体渲染。
+     另外，当配置里 UseHQFont=false 时，也会直接把该子集作为默认字体
+     加载，避免 ImGui 退回只含 ASCII 的内置字体而导致中文变成方块。
 
 3. 编译参数
    · 新增文件：Directory.Build.props
@@ -39,8 +41,10 @@ OptiScaler 使用 GNU General Public License v3.0（GPLv3）授权发布。
      只翻译以「;」开头的注释行，键名与取值一律未改动。
 
 5. 安装脚本提示汉化
-   · 修改文件：setup_windows.bat
-     只翻译交互提示文字，批处理逻辑完全未改动。
+   · 修改文件：setup_windows.bat、setup_linux.sh
+     只翻译交互提示文字与注释，脚本逻辑完全未改动。
+     setup_linux.sh 保持 LF 换行（若为 CRLF，Linux 下会报 bad interpreter），
+     并已通过 bash -n 语法校验；批处理脚本保持 CRLF 换行，避免 cmd 解析异常。
 
 三、如何获取对应源码
 --------------------------------------------------------------------------------

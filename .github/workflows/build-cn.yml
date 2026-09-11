@@ -150,8 +150,21 @@ jobs:
             if ($txt.Contains($p)) { Write-Host "  [命中] $p" }
             else { throw "安装脚本中未找到「$p」" }
           }
-          if ($raw -notcontains 13) { Write-Host '  [提示] 安装脚本为 LF 换行（cmd 容错较差）' }
+          if ($raw -notcontains [byte]13) { Write-Host '  [提示] 安装脚本为 LF 换行（cmd 容错较差）' }
           else { Write-Host '  [ok] 安装脚本为 CRLF 换行' }
+
+          Write-Host '--- setup_linux.sh ---'
+          $sh = 'base\x64\Release\a\setup_linux.sh'
+          if (-not (Test-Path $sh)) { throw "未找到 $sh" }
+          $shRaw = [IO.File]::ReadAllBytes($sh)
+          $shTxt = [Text.Encoding]::UTF8.GetString($shRaw)
+          foreach ($p in @('你使用的是 Nvidia 显卡吗', 'Linux / Wine 用户请注意', '按回车键退出')) {
+            if ($shTxt.Contains($p)) { Write-Host "  [命中] $p" }
+            else { throw "setup_linux.sh 中未找到「$p」" }
+          }
+          # CRLF 会让内核把 shebang 读成 "/usr/bin/env bash\r"，Linux 下直接报 bad interpreter
+          if ($shRaw -contains [byte]13) { throw 'setup_linux.sh 含 CR(0x0D)，换行成了 CRLF，Linux 下会报 bad interpreter' }
+          else { Write-Host '  [ok] setup_linux.sh 为 LF 换行' }
 
       - name: 组装中文运行包
         shell: pwsh
@@ -164,6 +177,22 @@ jobs:
           Copy-Item 'overlay\zh-CN\使用说明.txt'      $pkg -Force
           Copy-Item 'overlay\zh-CN\源码与许可说明.txt' $pkg -Force
           Copy-Item 'overlay\zh-CN\LICENSE-GPLv3.txt' $pkg -Force
+
+          # 上游 PostBuildEvent 用 `copy NUL` 生成英文名的解压提示文件。
+          # 这里改成中文名：必须用 PowerShell——英文版 runner 的 cmd 会按 CP437
+          # 解释命令行里的中文，导致文件名变成乱码。改名失败不影响使用，故只告警。
+          $marker = Join-Path $pkg '!! EXTRACT ALL FILES TO GAME FOLDER !!'
+          if (Test-Path -LiteralPath $marker) {
+            try {
+              Rename-Item -LiteralPath $marker -NewName '!! 请将所有文件解压到游戏目录 !!' -ErrorAction Stop
+              Write-Host '  [ok] 解压提示文件已改为中文名'
+            } catch {
+              Write-Warning "解压提示文件改名失败（不影响使用）：$_"
+            }
+          } else {
+            Write-Warning '未找到上游生成的解压提示文件，跳过改名'
+          }
+
           Write-Host '=== 运行包内容 ==='
           Get-ChildItem -Recurse $pkg | ForEach-Object {
             Write-Host ('  ' + $_.FullName.Replace((Get-Location).Path + '\', ''))

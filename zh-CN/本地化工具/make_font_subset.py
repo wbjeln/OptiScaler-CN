@@ -20,7 +20,26 @@ import sys
 
 PY = sys.executable
 TOOLS = pathlib.Path(__file__).resolve().parent
-PROJ = TOOLS.parent
+
+
+def find_root(start: pathlib.Path) -> pathlib.Path:
+    """
+    找到源码根目录（含 OptiScaler/menu 的那一层）。
+
+    这个脚本既会在本地开发目录 <项目>/tools/ 下运行，也会随源码包分发在
+    <源码根>/zh-CN/本地化工具/ 下运行，两种布局的层级不同，所以要自动探测。
+    """
+    for p in [start, *start.parents]:
+        if (p / "OptiScaler" / "menu").is_dir():
+            return p
+        if (p / "src" / "OptiScaler" / "menu").is_dir():
+            return p / "src"
+    return start
+
+
+PROJ = find_root(TOOLS)
+# 中间产物目录（变量字体、子集字体）。放在工具目录旁边，两种布局下都可写。
+WORK = TOOLS.parent / "build"
 
 # 除界面用字外，额外保底字符（中文标点与常用符号，避免以后改文案缺字）
 EXTRA = "，。、：；！？（）【】《》“”‘’…—·～％＃＆＋－×÷°±§½¼¾①②③④⑤⑥⑦⑧⑨⑩㎡μΩ→←↑↓↔"
@@ -45,10 +64,10 @@ def collect_chars(root):
 
 
 def main():
-    src = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else PROJ / "src"
-    font_in = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else PROJ / "build" / "noto_var.ttf"
+    src = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else PROJ
+    font_in = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else WORK / "noto_var.ttf"
     out_h = pathlib.Path(sys.argv[3]) if len(sys.argv) > 3 else src / "OptiScaler" / "menu" / "font" / "NotoSansSC_Subset.h"
-    work = PROJ / "build"
+    work = WORK
 
     chars = collect_chars(src)
     cjk = sorted(c for c in chars if ord(c) > 0x2000)
