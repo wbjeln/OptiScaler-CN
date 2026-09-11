@@ -10,8 +10,11 @@ OptiScaler-CN 云编译助手
     python tools/ci.py logs   <run_id>     # 下载失败步骤的日志
     python tools/ci.py fetch  <run_id>     # 下载产物到 dist/
     python tools/ci.py trigger             # 手动触发一次构建
+    python tools/ci.py release <run_id>    # 把产物发布成 Release（固定下载地址）
 
-令牌来源：本机 git 凭据管理器（不落盘、不打印）。
+令牌来源优先级：环境变量 GITHUB_TOKEN / GH_TOKEN > --token-file 指定的文件 >
+本机 git 凭据管理器。之所以要有「令牌文件」这条路：在部分沙箱环境里
+`git credential fill` 打印完凭据后不会退出，进程会一直挂住。
 """
 import argparse
 import io
@@ -33,7 +36,30 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 # ------------------------------------------------------------------ 凭据
 
-def get_token() -> str:
+def read_token_file(path: str):
+    """从凭据导出文件里读取令牌（文件内需有 `password=` 行）"""
+    try:
+        text = pathlib.Path(path).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    for line in text.splitlines():
+        if line.startswith("password="):
+            tok = line[len("password="):].strip()
+            if tok:
+                return tok
+    return None
+
+
+def get_token(token_file: str = None) -> str:
+    env_tok = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if env_tok and env_tok.strip():
+        return env_tok.strip()
+    if token_file:
+        tok = read_token_file(token_file)
+        if tok:
+            return tok
+        sys.exit(f"错误：{token_file} 中没有 password= 行")
+
     env = dict(os.environ)
     env.update(GIT_TERMINAL_PROMPT="0", GCM_INTERACTIVE="never", GCM_PROVIDER="generic")
     out = ""
@@ -68,6 +94,14 @@ OPENER = urllib.request.build_opener(_NoAuthOnRedirect)
 TOKEN = None
 
 
+class ApiError(Exception):
+    """GitHub API 返回了非 2xx。带状态码，便于调用方区分「资源不存在」等情况。"""
+
+    def __init__(self, code: int, message: str):
+        self.code = code
+        super().__init__(f"HTTP {code}: {message}")
+
+
 def api(path: str, method: str = "GET", body=None, raw: bool = False):
     url = path if path.startswith("http") else f"{API}{path}"
     data = None
@@ -86,10 +120,20 @@ def api(path: str, method: str = "GET", body=None, raw: bool = False):
         with OPENER.open(req, timeout=60) as r:
             payload = r.read()
     except urllib.error.HTTPError as e:
-        sys.exit(f"HTTP {e.code} {e.reason}: {e.read().decode('utf-8', 'replace')[:500]}")
+        raise ApiError(e.code, f"{e.reason} {e.read().decode('utf-8', 'replace')[:500]}") from None
     if raw:
         return payload
     return json.loads(payload.decode("utf-8", "replace")) if payload else None
+
+
+def api_soft(path: str, allow=(404,)):
+    """出错时返回 None 而不是抛异常，用于「不存在就创建」这类分支"""
+    try:
+        return api(path)
+    except ApiError as e:
+        if e.code in allow:
+            return None
+        raise
 
 
 # ------------------------------------------------------------------ 命令
@@ -200,6 +244,83 @@ def cmd_trigger(args):
     return 0
 
 
+DEFAULT_NOTES = """OptiScaler 简体中文版（汉化 + 预编译）
+
+解压 `OptiScaler-CN.zip` 到**游戏主程序 exe 所在目录**，双击 `setup_windows.bat`
+按中文提示操作即可。虚幻引擎游戏请解压到 `<游戏目录>\\<项目名>\\Binaries\\Win64`。
+
+- 设置菜单、提示弹窗、配置注释、安装脚本提示均为简体中文
+- 中文字体已内嵌进 DLL，无需另外安装字体
+- 功能逻辑与官方版本完全一致
+
+`OptiScaler-CN-source.zip` 是汉化后的完整源码（GPLv3 要求随二进制一并提供）。
+
+授权：GNU GPLv3。本汉化版由第三方制作，与 OptiScaler 原作者无关，仅供学习交流。
+"""
+
+
+def cmd_release(args):
+    """把构建产物发布成 GitHub Release，得到一个固定、永不过期的下载地址"""
+    dist = pathlib.Path(args.out)
+    want = ["OptiScaler-CN.zip", "OptiScaler-CN-source.zip"]
+
+    if args.run_id and args.run_id != "-":
+        if cmd_fetch(argparse.Namespace(run_id=args.run_id, out=str(dist))) != 0:
+            return 1
+
+    files = [dist / f for f in want if (dist / f).is_file()]
+    if not files:
+        print(f"没有找到可发布的产物（{dist} 下没有 {' / '.join(want)}）")
+        print("请先用 `python tools/ci.py fetch <运行ID>` 下载，或改用 --run-id <运行ID>。")
+        return 1
+    for f in want:
+        if not (dist / f).is_file():
+            print(f"[提示] 缺少 {f}，本次只发布已存在的文件")
+
+    notes = DEFAULT_NOTES
+    if args.notes_file:
+        notes = pathlib.Path(args.notes_file).read_text(encoding="utf-8")
+
+    rel = api_soft(f"/repos/{REPO}/releases/tags/{args.tag}")
+    if rel is None:
+        rel = api(f"/repos/{REPO}/releases", method="POST", body={
+            "tag_name": args.tag,
+            "name": args.name or f"OptiScaler 简体中文版 {args.tag}",
+            "body": notes,
+            "draft": False,
+            "prerelease": False,
+            "target_commitish": args.ref,
+        })
+        print(f"已创建 Release：{args.tag}")
+    else:
+        rel = api(f"/repos/{REPO}/releases/{rel['id']}", method="PATCH",
+                  body={"name": args.name or f"OptiScaler 简体中文版 {args.tag}", "body": notes})
+        print(f"Release {args.tag} 已存在，已更新说明")
+
+    # GitHub 不允许同名附件重复上传，先删掉旧的
+    old = {a["name"]: a["id"] for a in api(f"/repos/{REPO}/releases/{rel['id']}/assets")}
+    for f in files:
+        if f.name in old:
+            api(f"/repos/{REPO}/releases/assets/{old[f.name]}", method="DELETE")
+            print(f"  已删除同名旧附件 {f.name}")
+
+    base = f"https://uploads.github.com/repos/{REPO}/releases/{rel['id']}"
+    for f in files:
+        data = f.read_bytes()
+        req = urllib.request.Request(
+            f"{base}/assets?name={urllib.parse.quote(f.name)}", data=data, method="POST",
+            headers={"Authorization": f"Bearer {TOKEN}",
+                     "Accept": "application/vnd.github+json",
+                     "Content-Type": "application/zip",
+                     "User-Agent": "optiscaler-cn-ci"})
+        with OPENER.open(req, timeout=900) as r:
+            info = json.loads(r.read().decode("utf-8", "replace"))
+        print(f"  已上传 {f.name}  ({len(data)/1048576:.1f} MB)")
+
+    print(f"\n下载页面：https://github.com/{REPO}/releases/tag/{args.tag}")
+    return 0
+
+
 def main():
     global TOKEN
     ap = argparse.ArgumentParser()
@@ -223,9 +344,26 @@ def main():
     p.add_argument("--workflow", default="build-cn.yml")
     p.add_argument("--ref", default="main"); p.set_defaults(func=cmd_trigger)
 
+    p = sub.add_parser("release", help="把产物发布成 Release（固定下载地址）")
+    p.add_argument("run_id", nargs="?", default="-", help="运行 ID；填 - 表示用 --out 里已有的文件")
+    p.add_argument("--tag", default="v10.0.0-cn")
+    p.add_argument("--name", default=None)
+    p.add_argument("--out", default=str(ROOT / "dist"))
+    p.add_argument("--notes-file", default=None)
+    p.add_argument("--ref", default="main")
+    p.set_defaults(func=cmd_release)
+
+    ap.add_argument("--token-file", default=None,
+                    help="从文件读取令牌（文件内需有 password= 行）")
     args = ap.parse_args()
-    TOKEN = get_token()
-    return args.func(args)
+
+    global TOKEN
+    TOKEN = get_token(args.token_file)
+    try:
+        return args.func(args)
+    except ApiError as e:
+        print(f"GitHub API 调用失败：{e}")
+        return 1
 
 
 if __name__ == "__main__":

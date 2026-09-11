@@ -122,7 +122,8 @@ jobs:
           if (-not (Test-Path $dll)) { throw "未找到 $dll" }
           $txt = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($dll))
           # 这些中文来自界面文案，编译参数正确时必然存在于 DLL 中
-          $probes = @('启用帧生成', '超分', '锐化', '伪装', '快捷键', '默认')
+          # 这些中文来自界面文案与 resource.h 的汉化版标识，编译参数正确时必然存在于 DLL 中
+          $probes = @('启用帧生成', '超分', '锐化', '伪装', '快捷键', '默认', '简体中文版')
           foreach ($p in $probes) {
             if ($txt.Contains($p)) { Write-Host "  [命中] $p" }
             else { throw "DLL 中未找到中文探针「$p」—— 汉化未生效，请检查 /utf-8 编译参数" }

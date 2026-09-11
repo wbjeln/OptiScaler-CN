@@ -14,7 +14,14 @@ echo 原力与此脚本同在……
 echo v3.0-pre1
 echo.
 
-del "!! README_EXTRACT ALL FILES TO GAME FOLDER !!.txt" 2>nul
+REM 删除发布包中用于提示「解压到游戏目录」的占位文件。
+REM 这里用 "!!*" 通配而不写死文件名，因为三种名字都对不上：
+REM   · 历史上这里写的是 "!! README_EXTRACT ... !!.txt"
+REM   · 上游 PostBuildEvent 实际生成的是 "!! EXTRACT ALL FILES TO GAME FOLDER !!"
+REM   · 汉化打包时该文件被改成了中文名
+REM 用通配符可一次覆盖全部三种，且不必在批处理里写中文文件名（英文版 Windows
+REM 上 cmd 的代码页可能把中文文件名解析成乱码）。/q 用于跳过删除确认提示。
+del /q "!!*" 2>nul
 
 setlocal enabledelayedexpansion
 
