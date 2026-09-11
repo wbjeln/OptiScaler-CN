@@ -1,0 +1,208 @@
+name: Build OptiScaler CN (Windows x64)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 本仓库只保存「汉化改动文件」，相当于一个覆盖层（overlay）。
+# 构建流程：
+#   1. 检出本仓库（overlay）
+#   2. 把上游 OptiScaler 的指定提交克隆到 base/（含子模块）
+#   3. 用 overlay 覆盖 base/  ---  覆盖后 base/ 就是完整的汉化源码
+#   4. MSBuild 编译 Release x64
+#   5. 自动校验汉化确实编译进了 DLL / INI / 安装脚本
+#   6. 组装中文运行包 + 打包完整源码（GPLv3 要求随二进制提供对应源码）
+#
+# 产物：
+#   OptiScaler-CN-package -> OptiScaler-CN.zip        （解压到游戏目录即可用）
+#   OptiScaler-CN-source  -> OptiScaler-CN-source.zip （汉化后的完整源码）
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+env:
+  UPSTREAM_REPO: https://github.com/OptiScaler/OptiScaler.git
+  # 汉化所基于的上游提交（与本地汉化时的版本一致，保证可编译）
+  UPSTREAM_SHA: d36a078f
+  BUILD_CONFIG: Release
+  BUILD_PLATFORM: x64
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: 检出汉化覆盖层
+        uses: actions/checkout@v6
+        with:
+          path: overlay
+
+      - name: 克隆上游源码并切到指定提交
+        shell: pwsh
+        run: |
+          git clone --filter=blob:none --no-checkout $env:UPSTREAM_REPO base
+          if ($LASTEXITCODE -ge 128) { throw "克隆上游仓库失败（退出码 $LASTEXITCODE）" }
+
+          Push-Location base
+          git checkout $env:UPSTREAM_SHA
+          if ($LASTEXITCODE -ne 0) {
+            Write-Warning "未找到提交 $env:UPSTREAM_SHA，回退到 master 最新提交"
+            git checkout master
+            if ($LASTEXITCODE -ne 0) { throw "检出上游源码失败" }
+          }
+          Write-Host "上游版本：$(git rev-parse --short HEAD)  $(git log -1 --format=%s)"
+          git submodule update --init
+          if ($LASTEXITCODE -ne 0) { throw "拉取上游子模块失败" }
+          Pop-Location
+          $global:LASTEXITCODE = 0
+
+      - name: 用汉化文件覆盖上游源码
+        shell: pwsh
+        run: |
+          robocopy overlay base /E /IS /XD .git /NFL /NDL /NJH /NJS /NP | Out-Null
+          if ($LASTEXITCODE -ge 8) { throw "覆盖失败，robocopy 退出码 $LASTEXITCODE" }
+          Write-Host '=== 覆盖后关键文件检查 ==='
+          foreach ($f in @('Directory.Build.props',
+                           'OptiScaler\menu\font\NotoSansSC_Subset.h',
+                           'OptiScaler\menu\menu_common.cpp',
+                           'OptiScaler.ini',
+                           'setup_windows.bat',
+                           'zh-CN\使用说明.txt')) {
+            if (Test-Path (Join-Path 'base' $f)) { Write-Host "  [ok] $f" }
+            else { throw "覆盖后缺少 $f，说明 overlay 没生效" }
+          }
+          Write-Host '=== 子模块目录检查 ==='
+          foreach ($p in @('external\xess\bin',
+                           'external\FidelityFX-SDK',
+                           'external\FidelityFX-SDK-v2',
+                           'external\directx_agility_sdk')) {
+            if (Test-Path (Join-Path 'base' $p)) { Write-Host "  [ok] $p" }
+            else { throw "子模块缺失：$p" }
+          }
+          $global:LASTEXITCODE = 0
+
+      - name: 加入 MSBuild 到 PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: 打印编译环境与版本号
+        shell: pwsh
+        run: |
+          Write-Host '=== MSBuild ==='
+          msbuild -version | Select-Object -Last 2
+          Write-Host '=== 源码版本号 ==='
+          Select-String -Path 'base\OptiScaler\resource.h' -Pattern 'VER_\w+' |
+            ForEach-Object { Write-Host ('  ' + $_.Line.Trim()) }
+          Write-Host '=== 汉化新增文件 ==='
+          Get-Item 'base\OptiScaler\menu\font\NotoSansSC_Subset.h', 'base\Directory.Build.props' |
+            Select-Object Name, Length
+          $global:LASTEXITCODE = 0
+
+      - name: 编译 Release x64
+        shell: pwsh
+        working-directory: base
+        run: msbuild /m /p:Configuration=$env:BUILD_CONFIG /p:Platform=$env:BUILD_PLATFORM OptiScaler.sln /verbosity:minimal
+
+      - name: 检查构建输出
+        shell: pwsh
+        run: |
+          $out = 'base\x64\Release\a'
+          if (-not (Test-Path $out)) { throw "未找到构建输出目录：$out" }
+          Get-ChildItem -Recurse $out | ForEach-Object {
+            Write-Host ('  ' + $_.FullName.Replace((Get-Location).Path + '\', ''))
+          }
+
+      - name: 校验中文字符串已编译进 DLL
+        shell: pwsh
+        run: |
+          $dll = 'base\x64\Release\a\OptiScaler.dll'
+          if (-not (Test-Path $dll)) { throw "未找到 $dll" }
+          $txt = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($dll))
+          # 这些中文来自界面文案，编译参数正确时必然存在于 DLL 中
+          $probes = @('启用帧生成', '超分', '锐化', '伪装', '快捷键', '默认')
+          foreach ($p in $probes) {
+            if ($txt.Contains($p)) { Write-Host "  [命中] $p" }
+            else { throw "DLL 中未找到中文探针「$p」—— 汉化未生效，请检查 /utf-8 编译参数" }
+          }
+          Write-Host 'DLL 汉化校验通过'
+
+      - name: 校验 INI 注释已汉化
+        shell: pwsh
+        run: |
+          $ini = 'base\x64\Release\a\OptiScaler.ini'
+          $hits = Select-String -Path $ini -Pattern '^\s*;.*[\u4e00-\u9fff]' | Select-Object -First 3
+          if (-not $hits) { throw 'OptiScaler.ini 中未找到中文注释' }
+          $hits | ForEach-Object { Write-Host ('  ' + $_.Line.Trim()) }
+          $total = (Select-String -Path $ini -Pattern '^\s*;.*[\u4e00-\u9fff]').Count
+          Write-Host "INI 中文注释行数：$total"
+          if ($total -lt 500) { throw "INI 中文注释行数异常偏少（$total），汉化可能不完整" }
+
+      - name: 校验安装脚本已汉化
+        shell: pwsh
+        run: |
+          $bat = 'base\x64\Release\a\setup_windows.bat'
+          $raw = [IO.File]::ReadAllBytes($bat)
+          $txt = [Text.Encoding]::UTF8.GetString($raw)
+          foreach ($p in @('请为 OptiScaler 选择一个文件名', 'chcp 65001')) {
+            if ($txt.Contains($p)) { Write-Host "  [命中] $p" }
+            else { throw "安装脚本中未找到「$p」" }
+          }
+          if ($raw -notcontains 13) { Write-Host '  [提示] 安装脚本为 LF 换行（cmd 容错较差）' }
+          else { Write-Host '  [ok] 安装脚本为 CRLF 换行' }
+
+      - name: 组装中文运行包
+        shell: pwsh
+        run: |
+          $pkg = 'base\x64\Release\package'
+          New-Item -ItemType Directory -Force -Path $pkg | Out-Null
+          Copy-Item 'base\x64\Release\a\*' $pkg -Recurse -Force
+          New-Item -ItemType Directory -Force -Path (Join-Path $pkg '文档') | Out-Null
+          Copy-Item 'overlay\zh-CN\文档\*' (Join-Path $pkg '文档') -Force
+          Copy-Item 'overlay\zh-CN\使用说明.txt'      $pkg -Force
+          Copy-Item 'overlay\zh-CN\源码与许可说明.txt' $pkg -Force
+          Copy-Item 'overlay\zh-CN\LICENSE-GPLv3.txt' $pkg -Force
+          Write-Host '=== 运行包内容 ==='
+          Get-ChildItem -Recurse $pkg | ForEach-Object {
+            Write-Host ('  ' + $_.FullName.Replace((Get-Location).Path + '\', ''))
+          }
+
+      - name: 打包运行版
+        shell: pwsh
+        run: |
+          if (Test-Path 'OptiScaler-CN.zip') { Remove-Item 'OptiScaler-CN.zip' -Force }
+          7z a -tzip -mx=7 'OptiScaler-CN.zip' '.\base\x64\Release\package\*' | Out-Null
+          if ($LASTEXITCODE -ge 2) { throw "7z 压缩失败，退出码 $LASTEXITCODE" }
+          Get-Item 'OptiScaler-CN.zip' | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,2)}}
+
+      - name: 打包汉化后完整源码（GPLv3 合规）
+        shell: pwsh
+        run: |
+          # base/ 已被覆盖层替换过，就是完整的汉化源码；排除 .git 与 external 子模块内容
+          # （子模块是未修改的上游第三方组件，由 .gitmodules 固定提交号，说明见 zh-CN\源码与许可说明.txt）
+          if (Test-Path 'OptiScaler-CN-source.zip') { Remove-Item 'OptiScaler-CN-source.zip' -Force }
+          7z a -tzip -mx=5 'OptiScaler-CN-source.zip' '.\base\*' -xr'!.git' -xr'!external' -xr'!x64' | Out-Null
+          if ($LASTEXITCODE -ge 2) { throw "7z 压缩失败，退出码 $LASTEXITCODE" }
+          # 同时附上覆盖层本身（体积很小，便于核对具体改动）
+          7z a -tzip -mx=5 'OptiScaler-CN-source.zip' '.\overlay\*' -xr'!.git' | Out-Null
+          Get-Item 'OptiScaler-CN-source.zip' | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,2)}}
+
+      - name: 上传运行包
+        uses: actions/upload-artifact@v7
+        with:
+          name: OptiScaler-CN-package
+          path: OptiScaler-CN.zip
+          archive: false
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: 上传源码包
+        uses: actions/upload-artifact@v7
+        with:
+          name: OptiScaler-CN-source
+          path: OptiScaler-CN-source.zip
+          archive: false
+          compression-level: 0
+          if-no-files-found: error
