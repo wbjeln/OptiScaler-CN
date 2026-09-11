@@ -21,7 +21,8 @@ on:
     branches: [main, master]
 
 permissions:
-  contents: read
+  # 需要写权限：构建成功后要把成品发布成 Release（提供固定下载地址）
+  contents: write
 
 env:
   UPSTREAM_REPO: https://github.com/OptiScaler/OptiScaler.git
@@ -236,3 +237,32 @@ jobs:
           archive: false
           compression-level: 0
           if-no-files-found: error
+
+      # 在 runner 上直接发布 Release：得到固定、永不过期的下载地址。
+      # 放在 Actions 里做而不是本地下载后再传，是因为成品包约 120MB，
+      # 走本地网络（尤其经代理）传大文件很容易中断。
+      # 用预装的 gh 命令而不是第三方 action，少一层依赖。
+      - name: 发布到 Releases
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 工作目录本身不是 git 仓库（只有 overlay/ 和 base/ 两个子目录是），
+          # 必须显式告诉 gh 操作哪个仓库，否则它会因「找不到 git 仓库」失败
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $tag = 'v10.0.0-cn'
+          $title = 'OptiScaler 简体中文版 v10.0.0-cn'
+
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Release $tag 已存在，更新说明并覆盖附件"
+            gh release edit $tag --title $title --notes-file .github/release-notes.md
+          } else {
+            Write-Host "创建 Release $tag"
+            gh release create $tag --title $title --notes-file .github/release-notes.md --latest
+          }
+
+          gh release upload $tag OptiScaler-CN.zip OptiScaler-CN-source.zip --clobber
+
+          Write-Host '=== 发布完成，下载地址 ==='
+          Write-Host "https://github.com/$env:GITHUB_REPOSITORY/releases/tag/$tag"

@@ -219,6 +219,13 @@ def cmd_logs(args):
             print(ln)
 
 
+def safe_target(out: pathlib.Path, name: str) -> pathlib.Path:
+    """拼出落盘路径，并挡住 zip 里的绝对路径与 ../ 越界（zip-slip）"""
+    rel = pathlib.PurePosixPath(name.replace("\\", "/"))
+    parts = [p for p in rel.parts if p not in ("", ".", "..", "/")]
+    return out.joinpath(*parts)
+
+
 def cmd_fetch(args):
     out = pathlib.Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -227,12 +234,42 @@ def cmd_fetch(args):
         print("该次运行没有产物")
         return 1
     for a in arts:
-        print(f"下载产物：{a['name']}（{a['size_in_bytes']/1048576:.1f} MB）")
+        name = a["name"]
+        print(f"下载产物：{name}（{a['size_in_bytes']/1048576:.1f} MB）")
         blob = api(a["archive_download_url"], raw=True)
-        zf = zipfile.ZipFile(io.BytesIO(blob))
-        for n in zf.namelist():
-            target = out / pathlib.Path(n).name
-            target.write_bytes(zf.read(n))
+
+        try:
+            zf = zipfile.ZipFile(io.BytesIO(blob))
+            names = [n for n in zf.namelist() if not n.endswith("/")]
+        except zipfile.BadZipFile:
+            target = out / name
+            target.write_bytes(blob)
+            print(f"   -> {target}  ({target.stat().st_size/1048576:.1f} MB)")
+            continue
+
+        # 情况 1：GitHub 的「产物包装 zip」——里面只有我们要的那一个压缩包
+        if len(names) == 1 and names[0].lower().endswith((".zip", ".7z")):
+            target = out / pathlib.PurePosixPath(names[0]).name
+            target.write_bytes(zf.read(names[0]))
+            print(f"   -> {target}  ({target.stat().st_size/1048576:.1f} MB)")
+            continue
+
+        # 情况 2：工作流用了 upload-artifact 的 archive:false，GitHub 直接把原文件作为
+        # 产物提供（产物名就是文件名）。此时下载到的字节本身就是那个压缩包，
+        # 必须原样另存，绝不能当包装包去解包——否则整棵目录树会被压平成一堆文件。
+        if pathlib.PurePosixPath(name).suffix.lower() in (".zip", ".7z"):
+            target = out / name
+            target.write_bytes(blob)
+            print(f"   -> {target}  ({target.stat().st_size/1048576:.1f} MB)")
+            continue
+
+        # 情况 3：普通产物 zip，按原目录结构解包
+        for info in zf.infolist():
+            if info.is_dir():
+                continue
+            target = safe_target(out, info.filename)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(zf.read(info))
             print(f"   -> {target}  ({target.stat().st_size/1048576:.1f} MB)")
     return 0
 
