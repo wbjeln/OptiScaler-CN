@@ -20,6 +20,11 @@ OptiScaler 使用 GNU General Public License v3.0（GPLv3）授权发布。
        OptiScaler/dllmain.cpp
    · 把界面上的英文文案替换为简体中文，共约 1000 处字符串。
      所有占位符（{}、{0}、%%、##ID）和转义引号都保持原样。
+   · 另外，运行时弹出的提示框（ImGuiToast / ImGui::InsertNotification）也一并
+     汉化，例如「无法初始化 FSR 帧生成」「超分运行失败」「回退到 FSR 2.1.2」
+     「无法加载 amd_fidelityfx_dx12」等，共 22 条，涉及 hooks/、inputs/、
+     upscalers/、proxies/ 下的 12 个文件。
+     注意：写日志用的 LOG_* 文案未做汉化（不属于界面范围）。
 
 2. 中文字体支持
    · 新增文件：OptiScaler/menu/font/NotoSansSC_Subset.h
@@ -63,9 +68,22 @@ OptiScaler 使用 GNU General Public License v3.0（GPLv3）授权发布。
 GPLv3 第 3 节要求分发二进制时提供「对应源码」。本汉化版的完整源码包含在
 随附的源码压缩包中（文件名通常为 OptiScaler-CN-source.zip）。
 
-源码压缩包内容 = 上述修改后的完整工程，可直接使用 Visual Studio + MSBuild
-编译，命令为：
-    msbuild /m /p:Configuration=Release OptiScaler.sln
+源码压缩包内容 = 上述修改后的完整工程。但需要注意：包内**不含** external/ 下的
+第三方子模块（XeSS、FidelityFX 等 SDK 与预编译库，属于未修改的上游第三方组件，
+按各自许可单独发布），也不含 .git 目录，因此**不能直接编译**——
+缺少子模块里的 .lib/.dll 会导致链接失败。
+
+要得到可编译的完整源码，请按下面两步操作（与本项目 GitHub Actions 中的流程一致）：
+
+  1) 克隆上游并切到汉化所基于的提交，同时拉取全部子模块：
+       git clone https://github.com/OptiScaler/OptiScaler.git work
+       cd work
+       git checkout d36a078f
+       git submodule update --init
+
+  2) 把本源码包里的文件覆盖到 work/（保持目录结构），即得到完整汉化源码。然后：
+       msbuild /m /p:Configuration=Release /p:Platform=x64 OptiScaler.sln
+     产物在 x64\Release\a\
 
 如果源码包不慎丢失，也可以：
   · 从原始项目 https://github.com/OptiScaler/OptiScaler 获取官方源码；

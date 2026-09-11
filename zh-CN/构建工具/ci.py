@@ -219,6 +219,42 @@ def cmd_logs(args):
             print(ln)
 
 
+def download(url: str, dest: pathlib.Path = None, retries: int = 3):
+    """
+    下载，dest 不为 None 时落盘。大文件（成品包约 120MB）经代理传输很容易中断，
+    所以这里分块写盘 + 失败重试 + 超时放宽，并且先写 .part 再改名，
+    避免中断留下一个看起来完整、其实残缺的文件。
+    """
+    last = None
+    for attempt in range(1, retries + 1):
+        try:
+            req = urllib.request.Request(url, headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": "optiscaler-cn-ci"})
+            if TOKEN:
+                req.add_header("Authorization", f"Bearer {TOKEN}")
+            with OPENER.open(req, timeout=600) as r:
+                if dest is None:
+                    return r.read()
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                part = dest.with_name(dest.name + ".part")
+                got = 0
+                with open(part, "wb") as fh:
+                    while True:
+                        chunk = r.read(1 << 20)
+                        if not chunk:
+                            break
+                        fh.write(chunk)
+                        got += len(chunk)
+                part.replace(dest)
+                return got
+        except Exception as e:  # noqa: BLE001 — 网络类异常都要重试
+            last = e
+            print(f"    ! 下载中断（第 {attempt}/{retries} 次）：{e}")
+            time.sleep(3 * attempt)
+    raise ApiError(0, f"下载失败（已重试 {retries} 次）：{last}")
+
+
 def safe_target(out: pathlib.Path, name: str) -> pathlib.Path:
     """拼出落盘路径，并挡住 zip 里的绝对路径与 ../ 越界（zip-slip）"""
     rel = pathlib.PurePosixPath(name.replace("\\", "/"))
@@ -236,21 +272,24 @@ def cmd_fetch(args):
     for a in arts:
         name = a["name"]
         print(f"下载产物：{name}（{a['size_in_bytes']/1048576:.1f} MB）")
-        blob = api(a["archive_download_url"], raw=True)
+        # 先落到临时文件再判断结构，避免把上百 MB 读进内存
+        tmp = out / ".fetch.tmp"
+        download(a["archive_download_url"], tmp)
 
         try:
-            zf = zipfile.ZipFile(io.BytesIO(blob))
+            zf = zipfile.ZipFile(tmp)
             names = [n for n in zf.namelist() if not n.endswith("/")]
         except zipfile.BadZipFile:
-            target = out / name
-            target.write_bytes(blob)
-            print(f"   -> {target}  ({target.stat().st_size/1048576:.1f} MB)")
+            tmp.replace(out / name)
+            print(f"   -> {out / name}  ({(out / name).stat().st_size/1048576:.1f} MB)")
             continue
 
         # 情况 1：GitHub 的「产物包装 zip」——里面只有我们要的那一个压缩包
         if len(names) == 1 and names[0].lower().endswith((".zip", ".7z")):
             target = out / pathlib.PurePosixPath(names[0]).name
-            target.write_bytes(zf.read(names[0]))
+            with zf, open(target, "wb") as fh:
+                fh.write(zf.read(names[0]))
+            tmp.unlink(missing_ok=True)
             print(f"   -> {target}  ({target.stat().st_size/1048576:.1f} MB)")
             continue
 
@@ -259,18 +298,22 @@ def cmd_fetch(args):
         # 必须原样另存，绝不能当包装包去解包——否则整棵目录树会被压平成一堆文件。
         if pathlib.PurePosixPath(name).suffix.lower() in (".zip", ".7z"):
             target = out / name
-            target.write_bytes(blob)
+            zf.close()
+            tmp.replace(target)
             print(f"   -> {target}  ({target.stat().st_size/1048576:.1f} MB)")
             continue
 
-        # 情况 3：普通产物 zip，按原目录结构解包
+        # 情况 3：普通产物 zip，按原目录结构解包（不能只取文件名，否则子目录会被压平）
         for info in zf.infolist():
             if info.is_dir():
                 continue
             target = safe_target(out, info.filename)
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(zf.read(info))
+            with open(target, "wb") as fh:
+                fh.write(zf.read(info))
             print(f"   -> {target}  ({target.stat().st_size/1048576:.1f} MB)")
+        zf.close()
+        tmp.unlink(missing_ok=True)
     return 0
 
 

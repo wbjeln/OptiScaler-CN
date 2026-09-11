@@ -24,6 +24,14 @@ permissions:
   # 需要写权限：构建成功后要把成品发布成 Release（提供固定下载地址）
   contents: write
 
+# 同一时间只允许一个构建在跑。
+# 原因：构建最后一步会创建/更新 Release 并覆盖同名附件；若两次推送并发执行，
+# 两个任务会同时删改同一批附件，可能出现「说明来自 A、包来自 B」的错配，
+# 甚至短暂出现没有附件的 Release。排队串行可以彻底避免这种竞态。
+concurrency:
+  group: build-cn
+  cancel-in-progress: false
+
 env:
   UPSTREAM_REPO: https://github.com/OptiScaler/OptiScaler.git
   # 汉化所基于的上游提交（与本地汉化时的版本一致，保证可编译）
@@ -123,8 +131,10 @@ jobs:
           if (-not (Test-Path $dll)) { throw "未找到 $dll" }
           $txt = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($dll))
           # 这些中文来自界面文案，编译参数正确时必然存在于 DLL 中
-          # 这些中文来自界面文案与 resource.h 的汉化版标识，编译参数正确时必然存在于 DLL 中
-          $probes = @('启用帧生成', '超分', '锐化', '伪装', '快捷键', '默认', '简体中文版')
+          # 这些中文来自界面文案、运行时提示弹窗（ImGuiToast）与 resource.h 的汉化版标识，
+          # 编译参数正确时必然存在于 DLL 中
+          $probes = @('启用帧生成', '超分', '锐化', '伪装', '快捷键', '默认', '简体中文版',
+                      '无法初始化 FSR 帧生成', '超分运行失败')
           foreach ($p in $probes) {
             if ($txt.Contains($p)) { Write-Host "  [命中] $p" }
             else { throw "DLL 中未找到中文探针「$p」—— 汉化未生效，请检查 /utf-8 编译参数" }
