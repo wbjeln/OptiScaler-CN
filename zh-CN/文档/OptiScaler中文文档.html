@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="RIwI8wO2qrA9WMABhF3gTF">
+<head data-page-node-id="npn6TGmaZOUEC226oEuSv5">
+<meta charset="UTF-8" data-page-node-id="tPflxTPtKMB8o4ImP6LpNl">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="ZCVWS3btqFoUF9HvGQYYHd">
+<title>OptiScaler 中文文档</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --border: #e3e6ea;
+    --text: #24292f; --muted: #6a737d;
+    --accent: #2563eb; --accent-soft: #eff4ff;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: "Microsoft YaHei", "PingFang SC", -apple-system, "Segoe UI", sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.75; }
+  .layout { display:flex; min-height:100vh; }
+  aside {
+    width: 240px; flex:0 0 240px; background: var(--panel); border-right:1px solid var(--border);
+    padding: 24px 16px; position: sticky; top:0; height:100vh; overflow:auto;
+  }
+  aside h1 { font-size: 17px; margin: 0 0 4px; }
+  aside .sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  aside nav a {
+    display:block; padding:8px 12px; margin:2px 0; border-radius:8px;
+    color: var(--text); text-decoration:none; font-size:14px;
+  }
+  aside nav a:hover { background: var(--accent-soft); }
+  aside nav a.active { background: var(--accent-soft); color: var(--accent); font-weight:600; }
+  aside .warn {
+    margin-top:24px; padding:12px; font-size:12.5px; background:#fff7ed;
+    border:1px solid #fed7aa; border-radius:10px; color:#9a3412;
+  }
+  main { flex:1; min-width:0; padding: 32px 40px 80px; max-width: 980px; }
+  section {
+    background: var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding: 28px 36px; margin-bottom: 32px; scroll-margin-top: 24px;
+  }
+  .doc-src { font-size:12px; color: var(--muted); border-bottom:1px dashed var(--border);
+              padding-bottom:10px; margin-bottom: 8px; }
+  h1 { font-size: 26px; } h2 { font-size: 21px; border-bottom:1px solid var(--border); padding-bottom:8px; margin-top:36px; }
+  h3 { font-size: 17px; margin-top: 28px; }
+  code { background:#f0f1f3; border-radius:4px; padding:1px 6px; font-size: 0.9em;
+          font-family: Consolas, "Courier New", monospace; }
+  pre { background:#0f172a; color:#e2e8f0; padding:16px 18px; border-radius:10px; overflow:auto; }
+  pre code { background:transparent; color:inherit; padding:0; }
+  blockquote { margin:0; padding: 10px 18px; border-left:4px solid var(--accent);
+                background: var(--accent-soft); border-radius: 0 10px 10px 0; color:#374151; }
+  table { border-collapse: collapse; width:100%; margin: 14px 0; font-size: 14px; }
+  th, td { border:1px solid var(--border); padding: 8px 12px; text-align:left; }
+  th { background:#f0f4f8; }
+  img { max-width:100%; border:1px solid var(--border); border-radius:8px; }
+  details { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding: 10px 16px; margin: 10px 0; }
+  summary { cursor:pointer; font-weight:600; }
+  a { color: var(--accent); }
+  @media (max-width: 900px) {
+    .layout { flex-direction: column; }
+    aside { width:100%; flex:none; position:static; height:auto; border-right:none; border-bottom:1px solid var(--border); }
+    main { padding: 20px 16px 60px; }
+    section { padding: 20px; }
+  }
+</style>
+</head>
+<body data-page-node-id="7hRC0KuZesKw1c71u3gO6i">
+<div class="layout" data-page-node-id="Hro85aHgrdMuPrkwj5uW4H">
+  <aside data-page-node-id="ZS0iREYcxbXW4lAAiEvHkt">
+    <h1 data-page-node-id="QSEmE0C7DN8lATCuZOOVRK">OptiScaler</h1>
+    <div class="sub" data-page-node-id="TTCvsCvAd28XpCCwOOruKV">中文文档 · 基于 GitHub 官方英文文档翻译</div>
+    <nav data-page-node-id="ScN4s0XXpyEBmthzQ7Q4eB">
+      <a href="#sec0" class="active" data-page-node-id="xQEP2cAhQGlmRdt9rETrjT">项目介绍</a><a href="#sec1" class="" data-page-node-id="CAJTEiICYRLXT622dciNfp">功能特性</a><a href="#sec2" class="" data-page-node-id="UWaPd4QocqBACpGm6xO64M">配置说明</a><a href="#sec3" class="" data-page-node-id="hCoIMKGFkdEW7doTUUSKFp">GPU 伪装</a><a href="#sec4" class="" data-page-node-id="Vj3AsIzCPBiHypV5NuLgcY">已知问题</a>
+      <a href="https://github.com/optiscaler/OptiScaler/wiki" target="_blank" data-page-node-id="kxN4thz4M9kwTF6CgCB6jL">英文 Wiki ↗</a>
+    </nav>
+    <div class="warn" data-page-node-id="IbhgIBfdBIDtT1kpFpRBNV">⚠️ 防诈骗：OptiScaler 无官方网站、无官方管理器，且完全免费。正规渠道仅有 GitHub、官方 Discord 和作者 NexusMods 页面。</div>
+  </aside>
+  <main data-page-node-id="LSEr3D7QWbbZadngYfBnt8">
+    <section id="sec0" data-page-node-id="GAzLw225LUpYr6GPT0wf0C"><div class="doc-src" data-page-node-id="sXIAm8sj03eFZ87cCHSXFu">README.zh.md · 原文链接见各文件顶部</div><h1 id="optiscaler" data-page-node-id="uJlGmcodTAz8k61yD1YcEk">关于 OptiScaler</h1>
+<blockquote data-page-node-id="rFrIsOHxbsIEy9PYKKg5Fq">
+<p data-page-node-id="ZLRYaHD9A83HxzFnNZgibC">原文：<a href="https://github.com/OptiScaler/OptiScaler/blob/master/README.md" data-page-node-id="a0MPIJTFPzaG6vVUEKWf3A">README.md</a> | 中文翻译仅供参考</p>
+</blockquote>
+<h2 id="_1" data-page-node-id="9nB0E8OXlSF9QfHpkmM7nf">目录</h2>
+<ol data-page-node-id="3139p60E5EW5puDHAr2LNE">
+<li data-page-node-id="N7VWiKL3ZeQVDy3ZBOMAeR"><a href="#关于" data-page-node-id="kq1CfE5F53Gkz6t9QZwW6v">关于</a></li>
+<li data-page-node-id="RZkx1ABquAPQwxCe9asK7h"><a href="#工作原理" data-page-node-id="LYY6E88HVoKbQcnQRvUff4">工作原理</a></li>
+<li data-page-node-id="1OrTboULzhsKRhy0k2i8Zb"><a href="#支持哪些-api-和超分技术" data-page-node-id="Hxs323nPqlcjzdSvKbK3zm">支持的 API 和超分技术</a></li>
+<li data-page-node-id="lh59llXYXv8xyndjiR4dT4"><a href="#安装" data-page-node-id="aAI0YxxzlmC8vrKtfID95L">安装</a></li>
+<li data-page-node-id="MJ42siqi2QhpHdmn7sZGEW"><a href="#已知问题" data-page-node-id="uzsLmGRfhtPsDuwfdLODHw">已知问题</a></li>
+<li data-page-node-id="dJSlokAlENWLqjB4X01jh4"><a href="#编译" data-page-node-id="j8dFCewZigikTBxaUqVRv1">编译与致谢</a></li>
+<li data-page-node-id="LenFsKKEDcb8C1qfGrTcw9"><a href="https://github.com/optiscaler/OptiScaler/wiki" data-page-node-id="IPT1IySqxEQDCQOq5XroNU">Wiki（英文）</a></li>
+</ol>
+<h2 id="_2" data-page-node-id="GlbhfGhlahz5YFsOL2u4Hf">关于</h2>
+<p data-page-node-id="g8uHFVSFTRXVz7KMHZBAhC"><strong data-page-node-id="iRHA7XpBEteowD7Z1EyrlA">OptiScaler</strong> 是一款工具，可以让玩家在 <strong data-page-node-id="ygtzDsY5ceeKCSfjC4z0BG"><em data-page-node-id="J4Y4zP4yX5zdlWWxKim18t">已支持 DLSS2+ / FSR2+ / XeSS</em></strong>（注1）的游戏中<strong data-page-node-id="XdMjofZwZ9YvPb1ejHEDTs">替换超分辨率方案</strong>，并管理这些游戏的<strong data-page-node-id="T2zTz6j71tTTI0wWoDzxD1"><em data-page-node-id="ivMqQ3G3kfcm5Ul43DE40N">帧生成</em></strong>功能 <em data-page-node-id="dvfYFGUc4UficIg65ICluc">（既可以替换游戏自带的帧生成选项，也可以通过实验性的 <strong data-page-node-id="ECMtFNi02ITwfIlTfz8Hl8"><em data-page-node-id="GqaMtyP2EpqpGwWoNRDCj3">OptiFG</em></strong> 为 DX12 游戏开启帧生成）</em>。它还为所有用户提供了丰富的自定义选项，包括使用 Nvidia 显卡、走 DLSS 路线的用户。</p>
+<blockquote data-page-node-id="c78HkD5EPPKjZgLmNOR0i6">
+<p data-page-node-id="RqykD7lBp1QKVLDdF8NHrh">[!CAUTION] ⚠️ 防诈骗提醒
+* 我们注意到有一些<strong data-page-node-id="Xba39YRuvrI4FA4JGOv5qR">假冒网站</strong>自称是 OptiScaler 团队，因此在此强烈声明：我们<strong data-page-node-id="2epWeG5Y2pFHwQaseKcJIk">没有官方网站！</strong>
+* 我们<strong data-page-node-id="EAF9TQbtrlLUMgfkunIc6d">没有官方管理器应用</strong>，下载或使用此类软件请务必小心！也请不要为那些根本不是我们做的软件来找我们要支持！
+* 只有<strong data-page-node-id="whaOO0X1IVOXWl8xqs2cyL">正规渠道</strong>：本 GitHub 仓库、我们的 Discord 服务器、Nitec 的 NexusMods 页面。
+* OptiScaler <strong data-page-node-id="cmfZzleGQhOXdmZL2ojOnz">完全免费</strong>，任何形式的收费都是诈骗！</p>
+<p data-page-node-id="UBECPW5WiaJmdZuWxXXvxB">[!TIP] 💡 举个例子
+如果某款游戏只有 DLSS，OptiScaler 可以把 DLSS 替换成 XeSS 或 FSR 3.1（对只有 FSR2 的游戏同样有效，例如《天外世界：太空之选版》，但需要手动提供 nvngx_dlss.dll）。</p>
+</blockquote>
+<p data-page-node-id="BwGqm5YtfcE3orOo0IvAZG"><strong data-page-node-id="llbDgrMCDzkkGk74QSKunP">OptiScaler 的核心亮点：</strong></p>
+<ul data-page-node-id="UhqR7boWbFebPdqSNNqIoG">
+<li data-page-node-id="fdT4iLHEgT74hhAxdqziYf">在有（时间性）超分选项的游戏中启用 XeSS、FSR2、FSR3、<strong data-page-node-id="lGj13641TojZKFSS1YUUbl">FSR4</strong>（注2，<em data-page-node-id="yLYFfAXa064d2nS5RMMece">官方仅支持 RDNA4 和 RDNA3 独显</em>）以及 DLSS</li>
+<li data-page-node-id="e4wdl1IfnhRngHOM8fGcZl">提供大量微调与增强选项，让玩家自定义超分体验（RCAS &amp; MAS 锐化、输出缩放、DLSS 预设、比例与 DRS 覆盖等）</li>
+<li data-page-node-id="OgDhCmcZoxSXvAwRPF35Rj">自 v0.7.0 起，加入<strong data-page-node-id="aOGvqZ2xpkvop9sXnmM94B"><em data-page-node-id="kKuNoCNMNOWNg3AbCdtsXE">实验性 DX12</em></strong> 帧生成支持，并附带可能的 HUD 修复方案（<a href="#optifg--hudfix实验性-hud-残影修复" data-page-node-id="fAEBYax92iRSqZeBdMIvCt"><strong data-page-node-id="IgHMOu6J7RTKlbmwgQWBqj">OptiFG</strong></a>）</li>
+<li data-page-node-id="G4Kp4dpHZKgliNldAIdDdU">支持 <a href="#安装" data-page-node-id="ot5j9COxhNn1RFLmJaJ72Y"><strong data-page-node-id="7o5m1ITIcka1cpwTHgDaDD">Fakenvapi</strong></a> 集成——启用 Reflex 钩子并注入 <em data-page-node-id="h9esVCDTtEEIzNeUAQcyiO">Anti-Lag 2</em>（仅 RDNA1+）、<em data-page-node-id="RBlaGeSPSvz4feOM60Hg59">LatencyFlex</em>（LFX）或 <em data-page-node-id="5keKND9BcqS7JD5PpWawLE">XeLL</em>——<em data-page-node-id="9a9cFLdth8X3IExm1HSNHT">自 0.9 起内置</em></li>
+<li data-page-node-id="SicCYY1U0R6Lg2JSifELET">自 v0.7.7 起，支持 <strong data-page-node-id="06FnQGmd91HH7b1u2BuOoY">Nukem 的</strong> FSR3-FG 模组 <a href="#安装" data-page-node-id="z20yuN0kHpAQsp54RXutvp"><strong data-page-node-id="pMaoIDMnn98X5wVfG1OtX9">dlssg-to-fsr3</strong></a>，仅支持<strong data-page-node-id="bJsDKab9RobC62Qklgsatd"><em data-page-node-id="NpPq8Rnlw6ifmMbRauhZvC">原生 DLSS-FG</em></strong> 的游戏——<em data-page-node-id="keOWmyxh8TPNVBTkJTeTWL">自 0.9 起内置</em></li>
+<li data-page-node-id="gZfVpsQdEanSlQDtxvGIn0">自 v0.7.8 起，支持 <strong data-page-node-id="uHF1y4YYqM4q2JpHZtDwUc">ASI 插件加载</strong>（默认_关闭_，可通过 INI 中的 <code data-page-node-id="S73R8q9LX6vfFT02U9t7wN">LoadAsiPlugins=</code> 开启，从可自定义的目录加载，默认为 <code data-page-node-id="BAwCLqfC0CuB0BoUR7Sx2p">plugins</code>）</li>
+<li data-page-node-id="TbuFMLjHWLM6SxtWccQygf">新项目——<a href="https://github.com/optiscaler/OptiPatcher" data-page-node-id="m4jCsKsEnMqLjz63dp8wHc"><strong data-page-node-id="BsxJHKAoloaAckjGFRNzxc">OptiPatcher</strong></a>——一个 OptiScaler 的 ASI 插件，可在<strong data-page-node-id="5sOXQwvakFyoHjixQ4t73h"><em data-page-node-id="ZsBcBAOowMNuFPYfVt9z7E">受支持的游戏</em></strong>中无需伪装即可启用 DLSS 与 DLSSG 输入</li>
+<li data-page-node-id="x5L4Ler3lGfwiYAUtQK9DG">自 v0.7.8 起，OptiScaler 会自动为部分游戏打补丁，提供更好的开箱即用体验</li>
+<li data-page-node-id="9DNSuIJbfcs9AQ0FMxdQbJ">自 v0.9.0 起，帧生成输入与输出分离，加入 XeFG 和 FSR4-FG 支持，并内置 Fakenvapi 与 Nukem 的 FSR3-FG 模组</li>
+<li data-page-node-id="HjZSEGb02RXOiYjgS5BXam">完整功能列表请查看 <a href="Features.zh.md" data-page-node-id="v6a6EMA7mAahLPrd1G78Bk">功能特性（Features.md 中文版）</a></li>
+</ul>
+<blockquote data-page-node-id="FHFzd8pfdz2nDEIFYgc76A">
+<p data-page-node-id="9v2X1UWAL0kqPDqH555Vdn">[!IMPORTANT] ❗ 重要
+<em data-page-node-id="WNFe981IfmYuhux6pos8hF"><strong data-page-node-id="RGe27oZ0XmDcDaxvuHpD5t">使用前请务必查看 <a href="https://github.com/optiscaler/OptiScaler/wiki" data-page-node-id="NYq7o9IdEM5wn5yYlk4diM">Wiki 兼容性列表</a>，了解已知的游戏问题与解决方法。</strong></em>
+另请查看文末关于 <strong data-page-node-id="wiAurkgXCqDqBeuQlM2Yy1">RTSS</strong> 兼容性的 <a href="Issues.zh.md" data-page-node-id="i6nw7i29XBy8NN0BZ1IDJX"><strong data-page-node-id="ArwICoN3aDrkKZTQaTTfwR"><em data-page-node-id="0hLAdZw9R2pB9CvJmisMFc">OptiScaler 已知问题</em></strong></a>。
+社区维护的 FSR4 游戏测试列表见：<a href="https://github.com/optiscaler/OptiScaler/wiki/FSR4-Compatibility-List" data-page-node-id="6f3lLZkMC5k7INDvaXDHFl"><strong data-page-node-id="uZUxvE5XIZPJMxyLcHHRoj"><em data-page-node-id="KS31Chy9jvknNrFQ407Bew">FSR4 兼容性列表</em></strong></a>。
+<strong data-page-node-id="QY9Xi8IkZ5XT4AhtIisC93"><em data-page-node-id="NBRYewg4yKLIBvvHxIpea9">[3]</em></strong> 对于<strong data-page-node-id="DoKg0Wkrpe4pHX4s9GwDXj">未内置</strong>的组件，请查看<a href="#安装" data-page-node-id="iONS2nsuBaFAvy8VJX6rZd">安装</a>部分。</p>
+<p data-page-node-id="1FACRdjOECaLlwCVnQfs4H">[!NOTE] 📝 超分技术补充说明</p>
+<p data-page-node-id="RKk4cOPaN9JXRzolLyFFWQ"><details data-page-node-id="ehsPnxQOcTrLDJFL4ThDiH">
+<summary data-page-node-id="w7rKABg9ZGG7YeHXjQ93bM"><b data-page-node-id="wjQcWoiKeC79C3NUthOUXb">点击展开 注1、注2</b></summary></p>
+<p data-page-node-id="ds7NSEkvjX9PSlZBtrh1pL"><strong data-page-node-id="3PR5BU3ZPOSAreGPEprfIN">[1]</strong> 对于 <strong data-page-node-id="gqGj3SN1iaDZgGHSJIQlqD">Unreal Engine（虚幻引擎）</strong> 游戏，只有 UE 的 XeSS → Opti 的 XeSS/FSR4 可用。</p>
+<p data-page-node-id="ntG0QaIA1o6ktZcRxH1YgT"><em data-page-node-id="Oy71GtUDHCjShucIHvCsi6">关于 </em><em data-page-node-id="Ctd2bivyGvmAYfsLa4nejE">XeSS 输入</em><em data-page-node-id="gOk66f1Z3MCowUlmiVQGVX">：由于虚幻引擎插件不提供深度信息，替换游戏内的 XeSS 会导致其他超分方案失效（例如只支持 XeSS 的《Redout 2》），但你仍然可以对 XeSS 应用 RCAS 锐化来缓解画面模糊。</em></p>
+<p data-page-node-id="VN1nVCIbRnLV6HEEEa6kXa"><em data-page-node-id="jTRAFuk8PgBysUanLEAiHN">关于 </em><em data-page-node-id="GemAE12b1mTqrVsyfFN3t6">FSR 输入</em><em data-page-node-id="I0WoDAmEdaJh06dhr3u9rW">：FSR 3.1 是第一个完全标准化、面向未来的 API 版本，应当能被完整支持。由于 FSR2 和 FSR3 支持自定义接口，具体支持情况取决于开发者的实现方式。虚幻引擎游戏可能需要对 FSR 输入进行 <a href="https://github.com/optiscaler/OptiScaler/wiki/Unreal-Engine-Tweaks" data-page-node-id="gSUGVE2dImrT91a1Yb50FM">ini 调整</a>。</em></p>
+<p data-page-node-id="XYRrYuDs8GgE8uBuNVTd9f"><strong data-page-node-id="iJUHmcQSACTXSfEUSEpX4z">[2]</strong> <em data-page-node-id="dTGIm5WYaDMgp5upZlVQYp">关于 </em><em data-page-node-id="toCdNaB04E3M3zjWEx9zhv">FSR4</em><em data-page-node-id="wnvlyWtjG0T3GM8QCAEiuH">，请查看 <a href="https://github.com/optiscaler/OptiScaler/wiki/FSR4-Compatibility-List" data-page-node-id="3nH0lUBkJnFN7bUSGJfTaS">FSR4 兼容性列表</a> 了解已支持的游戏与相关信息。</em></p>
+</details>
+</blockquote>
+<h2 id="discord-optiscaler" data-page-node-id="voHCdGlyzwiD6rb74GUSyR">官方 Discord 服务器：<a href="https://discord.gg/wEyd9w4hG5" data-page-node-id="lyEEG9T4Yzzc1QjMUzggMr">OptiScaler</a></h2>
+<p data-page-node-id="u3hGFKpkkk9AsGVf3sZoxL"><em data-page-node-id="StclpsArsHDl1xSbMkYWWl">本项目基于 PotatoOfDoom 的优秀项目 <a href="https://github.com/PotatoOfDoom/CyberFSR2" data-page-node-id="adlvgFgxjSlP3HiaexSjUJ">CyberFSR2</a>。</em></p>
+<h2 id="_3" data-page-node-id="BpDsEwY1Ulk388LIhEdpD0">工作原理</h2>
+<ul data-page-node-id="tfZaIdIArUyclgndEqPmaq">
+<li data-page-node-id="a0rsWb2b08ppXLuOeZprUj">OptiScaler 充当中间件：拦截游戏发出的超分调用（<em data-page-node-id="8MFyqo8UWZEpnS16LIsThB"><strong data-page-node-id="ijCNBzcwXZJ1cE2kmepEeA">输入 / Input</strong></em>），并把它们转发给所选的超分后端（<em data-page-node-id="xwXtWJoUqSb6GQg7hgKCoC"><strong data-page-node-id="ENr2sceLBBuBQ07ShliTQ3">输出 / Output</strong></em>），从而让玩家把一种超分技术替换成另一种。流程为：<strong data-page-node-id="5bEmrNUIdAX4l5bZcQoMdv">输入 → OptiScaler → 输出</strong></li>
+<li data-page-node-id="yHKYsKmLro4ZY19ZNZUrTb"><em data-page-node-id="WY5dbZ9Hm3WgeyLhjdGC6F">说得直白一点：<strong data-page-node-id="ecpZs4vzMXFkrDdeijBIJl">输入</strong>就是游戏设置里选择的超分方案，<strong data-page-node-id="igIOkrWF5gv0FhpRHssASp">输出</strong>就是你在 OptiScaler 覆盖层（Overlay）里选择的方案。</em></li>
+<li data-page-node-id="9OFVWSNl2NpUMwCLuyh3VX"><em data-page-node-id="88jWTYIkQ9B2m2lweyDyEN">帧生成选项同理，分为 <strong data-page-node-id="fMAOLLjHNGKFtjWFhmwpEh">帧生成输入（FG Input）</strong> 和 <strong data-page-node-id="VKWTLN2GiTrQq5x5dJHwjR">帧生成输出（FG Output）</strong>。</em></li>
+</ul>
+<blockquote data-page-node-id="8wo4DKW2Ue1v2oVLCBCfCd">
+<p data-page-node-id="jQBws3sqdLCsB3OIB8xJ0F">[!NOTE] 📝
+* 按 <strong data-page-node-id="Co2UFYeINhuiXwPlMaXYoD"><code data-page-node-id="74GJE1m8THA3x3PBHKlbu2">Insert</code></strong> 键应可在游戏中打开 OptiScaler <strong data-page-node-id="DGIVNNTyjqyozs9U2MtX2l">覆盖层菜单</strong>（<code data-page-node-id="QUsfUJ33D3dUII3Muj2Yvl">ShortcutKey=</code> 可在 INI 文件中修改，或在覆盖层的 <strong data-page-node-id="NNOqHXDDOF5BmrT9EdFkHS">Keybinds</strong> 中修改）。
+* 按 <strong data-page-node-id="DaiR63uJVqEbvDnaBexVFn"><code data-page-node-id="DVceYf4VhWVKHyQd4OhQsN">Page Up</code></strong> 会在左上角显示性能统计覆盖层，按 <strong data-page-node-id="pcDJ8K37zmUMApxIavuRpA"><code data-page-node-id="LbCFzz1tfLATI2wvOrGCz4">Page Down</code></strong> 可在不同模式间切换（按键均可在覆盖层中自定义）。
+* 如果按 Insert 几次后 Opti 覆盖层都一闪而过/立即消失，可以试试 <strong data-page-node-id="7fo7fBZTIN36X1LwROvdQy"><code data-page-node-id="9CdQsG4TkI5w9QDrzzJ4xH">Alt + Insert</code></strong>（针对部分键盘布局的<a href="https://github.com/optiscaler/OptiScaler/issues/484" data-page-node-id="8ELet10WJfaYoqt8KkuCNf">已知解决方法</a>）。</p>
+</blockquote>
+<p data-page-node-id="mlBsZBo1aNiG4gjOrDB4So"><img alt="输入与输出示意图" src="https://github.com/user-attachments/assets/7ff37fd7-515f-488d-99ff-faa586e206fc" data-page-node-id="5JJB4fobGTAXq47Lr7eAwz" /></p>
+<h2 id="api" data-page-node-id="9MtVq8H5PBPjvWm9DQaOJX">支持哪些 API 和超分技术？</h2>
+<p data-page-node-id="vKqiHMm2OGysYmVCNkrHHB">目前 <strong data-page-node-id="sJfD8yxIOWV9X3wilpE7vB">OptiScaler</strong> 可用于 DirectX 11、DirectX 12 和 Vulkan，但每种 API 支持的超分方案不同。
+<a href="#optifg--hudfix实验性-hud-残影修复" data-page-node-id="EfvuogL2rxK3hkKE9GTkbi"><strong data-page-node-id="qOmxPZoNuBooUy6cIwTilS">OptiFG</strong></a> 目前<strong data-page-node-id="1BL7p3wmxBBBpx2FwjzKFx">仅支持 DX12</strong>，详见后文单独段落。</p>
+<h4 id="directx-12" data-page-node-id="U8gukOSaWL4k3s8DBnf98a">DirectX 12</h4>
+<ul data-page-node-id="iX5z63OXJTyXDshFg4Pfp3">
+<li data-page-node-id="Av1ma9CVejtG31JGmXEOnn">XeSS（默认）</li>
+<li data-page-node-id="MKbB77dSHdrv1ZM7EFXqb6">FSR 2.1.2、2.2.1</li>
+<li data-page-node-id="DgEuy7wRNBpiaEkqcBG9VX">FSR 3.X（以及 FSR 2.3.X）</li>
+<li data-page-node-id="C53AB9rvlTA2CgmxLIyqlU">FSR 4.X（通过 FSR 3.X/4，<em data-page-node-id="fw50BrkQ1GpLhyKLHFRGrL">官方仅支持 RDNA4 和 RDNA3 独显</em>）</li>
+<li data-page-node-id="4y5buFmYUKN1hLVwt0amdm">DLSS</li>
+</ul>
+<h4 id="directx-11" data-page-node-id="Ti9GtM6DcoUVhrfXj5IgGX">DirectX 11</h4>
+<ul data-page-node-id="ONMtDx8oEihfrEzFsrC51G">
+<li data-page-node-id="xuHn2iZoyGMnReidSchRCA">FSR 2.2.1（默认，原生 DX11）</li>
+<li data-page-node-id="6F2BWX2T70O7Jrn4whG34B">FSR 3.1.2（非官方移植的原生 DX11 版）</li>
+<li data-page-node-id="GhSEt4e51sOOuo8bT7CaYN">DLSS（原生 DX11）</li>
+<li data-page-node-id="C8hzzKkrIZfx1z095um1R8">XeSS 2.X（原生 DX11，<em data-page-node-id="CkC1Xh31FooHjWo2RansGd">仅 Intel ARC 显卡</em>）</li>
+<li data-page-node-id="sQtEsqRnBqut2RaRwRb1oS">XeSS、FSR 2.1.2、2.2.1、FSR 3.X（DX12 版，<em data-page-node-id="sxYV0nS63KOL3kuQlgxy9V">通过 D3D11on12</em>）（注1）</li>
+<li data-page-node-id="OyCanhDF2C1Ah9DvGpWjpO">FSR 4.X（通过 FSR 3.X/4 的 DX12 互操作，<em data-page-node-id="JTODVS6coppqpAkOkxFBDV">官方仅支持 RDNA4 和 RDNA3 独显</em>）</li>
+</ul>
+<blockquote data-page-node-id="GhRFjeYHrncx6Azaha6aIE">
+<p data-page-node-id="RFngV8SSzDvLcOVS7QVoID">[!NOTE] 📝
+<details data-page-node-id="7z8uQdNkNnGs00uS7Hq1QM">
+<summary data-page-node-id="KT3Hv3hPi77vKDcTD3muSp"><b data-page-node-id="ZFaPeJsqQdE8AKpwNEZFoT">点击展开 注1</b></summary></p>
+<p data-page-node-id="URfCOnsUBKdZ8RPwgwdFBM"><em data-page-node-id="9CVSp7SxVFD7Sfd4xZck9m"><strong data-page-node-id="OyWk5cMJktxNKWttkNTrdD">[1]</strong> 这些实现通过在后台创建 DirectX12 设备来使用仅支持 DX12 的超分方案。此方法会有约 10% 左右的性能损失，但换来更多超分选项。另外，原生 DX11 版 FSR 2.2.1 是从 Unity 渲染器反向移植的，自身存在一些问题，OptiScaler 已修复其中一部分。</em></p>
+</details>
+</blockquote>
+<h4 id="vulkan" data-page-node-id="uFwBTQ3ksWfsMByYgjImjM">Vulkan</h4>
+<ul data-page-node-id="J9LKTzzlVNlpQiXEQsYRtl">
+<li data-page-node-id="g0OQYPGdqXJ1Y7VbR9mR8B">FSR 4.X（通过 FSR 3.X/4 的 DX12 互操作，<em data-page-node-id="wJvNPNtAz32YHq3j6oMBEd">官方仅支持 RDNA4 和 RDNA3 独显</em>）</li>
+<li data-page-node-id="CaMNIyosqAE8s3axCkKpBx">FSR2 2.1.2（默认）、2.2.1</li>
+<li data-page-node-id="kg4SsXKtDje1YMr9LJ2Khu">FSR3 3.1（以及 FSR2 2.3.2）</li>
+<li data-page-node-id="7zeiDnwkucSayjJiQJJbWm">DLSS</li>
+<li data-page-node-id="qWz8o4gvGQyUGsH6dwrrci">XeSS 2.x</li>
+</ul>
+<h4 id="optifg-hudfix-hud" data-page-node-id="tVIlZljz7d9QDFJBAwcuRZ">OptiFG + HUDfix（实验性 HUD 残影修复）</h4>
+<p data-page-node-id="I8IMS1nLgWgBzpsP2tg2oY"><strong data-page-node-id="LCAzDmfFlCUoz363rWlb9D">OptiFG</strong> 于 <strong data-page-node-id="MewaFEEiDWRxxXzGEsDuGu">v0.7</strong> 加入，<strong data-page-node-id="GQHd2jgERPTgAjQ9v2ZZWZ">仅支持 DX12</strong>。
+它是一种<strong data-page-node-id="CiKnjh7zzn48iw3hYA0Wkp">实验性</strong>手段，可为没有原生帧生成的游戏添加帧生成；也可以在原生帧生成工作不正常时作为最后的兜底方案。</p>
+<ul data-page-node-id="rClzSXdXuYwfeSXmPIF8WT">
+<li data-page-node-id="LwYOxQzApiCv5jHEluxfpy">目前支持 FSR3-FG（需要开启 HUDfix 以避免 HUD 残影）、XeFG 和 FSR4-FG（由 ML 模型处理 HUD，可能需要也可能不需要 HUDfix）。</li>
+</ul>
+<p data-page-node-id="AagLWAMV2bWvoIKxKlwwtM">更多关于 OptiFG 的信息与使用方法，请查看 Wiki 页面：<a href="https://github.com/optiscaler/OptiScaler/wiki/OptiFG" data-page-node-id="9MdTz1X5U45YUiSSFoaYl7">OptiFG（英文）</a>。</p>
+<h2 id="_4" data-page-node-id="FS3HjFcANSDC6Gtb7dJzF4">安装</h2>
+<blockquote data-page-node-id="66N2kgNgBhFPECw1zE74U2">
+<p data-page-node-id="AdmBwN4ZhQlkdGjUGB2cUe">[!CAUTION] ⚠️ 警告
+<em data-page-node-id="hXKefRWHffV7V5vlVoZ6WU"><strong data-page-node-id="mtJgXsLCFTF410WD25I7bi">切勿在联机游戏中使用本模组！</strong> 它可能触发反作弊系统并导致封号！</em></p>
+<p data-page-node-id="r8ML1HBzfcnoqreiqLFwsl">[!IMPORTANT] ❗
+<strong data-page-node-id="KghelLmYu6IngCaJ2yOEQQ">具体安装步骤请查看 <a href="https://github.com/optiscaler/OptiScaler/wiki" data-page-node-id="yz1iLjxiyblSknXwbRTCmC">Wiki（英文）</a></strong></p>
+</blockquote>
+<h2 id="_5" data-page-node-id="Gruf8B5muNON1XxhJrCj3P">配置</h2>
+<p data-page-node-id="Qk8IlmBZ2WfB6QzJkUcuiC">配置参数与详细说明请查看 <a href="Config.zh.md" data-page-node-id="hrw8sU7UyDLu3q3kXE1JD0">配置说明（Config.md 中文版）</a>。如果你的显卡不是 Nvidia 的，请查看 <a href="Spoofing.zh.md" data-page-node-id="TvISH4wB0drzqxRXPcwvdg">GPU 伪装选项（Spoofing.md 中文版）</a> <em data-page-node-id="Q6c1zklP5oKKPupSJh8JNe">（英文原文标注：将会更新）</em>。</p>
+<h2 id="_6" data-page-node-id="A3PGId3jbEAt43m9bpmwvj">已知问题</h2>
+<blockquote data-page-node-id="uJKAmr4xUOepyQ1H0PT5qx">
+<p data-page-node-id="AEjmclRKOsZg2OHmHJyGWH">[!NOTE] 📝
+<strong data-page-node-id="bEuXZXpt1lAJOLH6ZMkVZp">已知问题列表请查看 <a href="https://github.com/optiscaler/OptiScaler/wiki" data-page-node-id="3EbS3ez8ywHXVOGN5eNXHV">Wiki（英文）</a></strong>。</p>
+<p data-page-node-id="kB70YWGN3jLGdntsaeFHQD">另外建议查看 <a href="https://github.com/optiscaler/OptiScaler/wiki/Compatibility-List" data-page-node-id="SIMejgm8YDJAzWTPctRF7B">兼容性列表</a>，了解可能的兼容性问题及修复方法。</p>
+</blockquote>
+<h2 id="_7" data-page-node-id="xGAnnmKvLpCWZJUJfSGIax">编译</h2>
+<h3 id="_8" data-page-node-id="Rj7YQfAy50ln0xE6nyX6k3">环境要求</h3>
+<ul data-page-node-id="HAZDw2JfsAa6Aqvui2gxNI">
+<li data-page-node-id="6YDCMzWN4V8PD9iPAFfDLz">Visual Studio 2022</li>
+</ul>
+<h3 id="_9" data-page-node-id="2HnTGgruHxhUgucDjfyb1V">步骤</h3>
+<ul data-page-node-id="ytuambn4w9mSTnZDCDAfyw">
+<li data-page-node-id="dD57CmWCOpE58a1ONH7Mkj">克隆本仓库时<strong data-page-node-id="JbFSKgVrQRQ51nzqY8vFw8">务必连同所有子模块（submodules）一起</strong>。</li>
+<li data-page-node-id="FvRIO6vjNQA71tRpuXyGCf">用 Visual Studio 2022 打开 OptiScaler.sln。</li>
+<li data-page-node-id="3ejbJDFki4zUo1p1cnM8C9">编译项目即可。</li>
+</ul>
+<h2 id="_10" data-page-node-id="b85SkBX4u1DA76qNKBCi0Y">鸣谢</h2>
+<ul data-page-node-id="TLE2AsdLSBfBSKNBAwyrhK">
+<li data-page-node-id="BBh4ngyZGlEhTZ49ZQuW6h">@PotatoOfDoom——CyberFSR2</li>
+<li data-page-node-id="jwhAeAb9cahtUAroloBaRO">@Artur——DLSS Enabler，以及帮助我正确实现 NVNGX API</li>
+<li data-page-node-id="hYU7g2zYmG0Q6HmycdOrHt">@LukeFZ 与 @Nukem——出色的模组与知识分享</li>
+<li data-page-node-id="D5qlPsPUL7tGaORZ1kRO6z">@FakeMichau——持续的支持、测试与功能推进</li>
+<li data-page-node-id="SJ6fgZUxa9CbhT9YlHTVRS">@QM——持续的测试工作，帮我接触到许多游戏</li>
+<li data-page-node-id="vSFiW0rFnYL6emsAky9Qed">@TheRazerMD——持续的测试与支持</li>
+<li data-page-node-id="cpgURYpy9ceNbZ1kvWEkTy">@Cryio、@krispy、@krisshietala、@Lordubuntu、@scz、@Veeqo——在（现已过时的）<a href="https://docs.google.com/spreadsheets/d/1qsvM0uRW-RgAYsOVprDWK2sjCqHnd_1teYAx00_TwUY" data-page-node-id="b4rJfuzMnSwMWJegRhyAts">兼容性矩阵</a>上的辛勤付出</li>
+<li data-page-node-id="qhCF5eyD0WlQ0AEQcw58MD">以及整个 DLSS2FSR 社区的支持</li>
+</ul>
+<h2 id="_11" data-page-node-id="YAx71IIzhgkWpzrBqQ8Izd">版权说明</h2>
+<p data-page-node-id="gAtM50Qni6iX0YwMbVHY0o">本项目使用了 <a href="https://gitlab.freedesktop.org/freetype/freetype" data-page-node-id="q3McG1ZFhCl8CidV4irE6B">FreeType</a>，遵循 <a href="https://gitlab.freedesktop.org/freetype/freetype/-/blob/master/docs/FTL.TXT" data-page-node-id="DqNUHTxGCiH8RGBPxTANa8">FTL 许可证</a>。</p>
+<h2 id="_12" data-page-node-id="2hFf5Ab75ABYFZrcZB7rJt">赞助者</h2>
+<table data-page-node-id="CagQApuUHKIZjlhfGmpxCg">
+ <tbody data-page-node-id="c6ilj7PdIi8qX4V2BxpE7s">
+  <tr data-page-node-id="zPC3UTLtfXFsG9tLSX1WOf">
+   <td align="center" data-page-node-id="BDFYrGBfBUUBQfW0Hu0Bqd"><img alt="SignPath" src="https://avatars.githubusercontent.com/u/34448643" height="30" data-page-node-id="R32GFUtEdsrc0omA9walYe"/></td>
+   <td data-page-node-id="NA5EDBdsMQNEqsC0ztmKNV">Windows 平台的免费代码签名由 <a href="https://signpath.io/" data-page-node-id="wlcSRGAw3Bw0zXh7z9B6vC">SignPath.io</a> 提供，证书由 <a href="https://signpath.org/" data-page-node-id="Nhf7RBc1cDr59TkHNTHpow">SignPath Foundation</a> 颁发</td>
+  </tr>
+ </tbody>
+</table></section><section id="sec1" data-page-node-id="c10YWnIR6hZAabMDiZpcXl"><div class="doc-src" data-page-node-id="mQG25kiGF5AxBlYPNDOLd4">Features.zh.md · 原文链接见各文件顶部</div><h1 id="_1" data-page-node-id="hqRHFv3cRacV2eu8VXsch5">功能特性</h1>
+<blockquote data-page-node-id="2FAQty8xfmGMeke84VnbJz">
+<p data-page-node-id="uM6B18U4CL6y5lGSOl7u9A">原文：<a href="https://github.com/OptiScaler/OptiScaler/blob/master/Features.md" data-page-node-id="7xojwouhHoF1TEQ1nhYUcY">Features.md</a> | 中文翻译仅供参考</p>
+</blockquote>
+<h2 id="_2" data-page-node-id="ZdwmKGHrBZjHii8ba85a9S">功能列表</h2>
+<ul data-page-node-id="JRCCgRHSXVFn0uXN5C6HYP">
+<li data-page-node-id="QOlarw9Fe3975TGGJ6ELdV">支持多种超分后端（XeSS、FSR 2.1.2、FSR 2.2.1、FSR 3.1 与 DLSS）</li>
+<li data-page-node-id="W1Z3AyHfvgdEs9K32YOsEh">0.7.0 及以上版本提供实验性帧生成支持（OptiFG，基于 FSR）</li>
+<li data-page-node-id="FyoJTYbtYU3RgW6QjiOGjK">支持 DLSS 3.7 及以上版本（请查看<a href="https://github.com/OptiScaler/OptiScaler#install-as-non-nvngx" data-page-node-id="ZzB5ehiAo8NHpjzOJD4zLY">安装说明</a>）</li>
+<li data-page-node-id="8j4KT1vGyDqFRHta8uY6nv">在 Nvidia 显卡上支持 DLSS-D（光线重建 / Ray Reconstruction）（支持切换预设并使用 OptiScaler 增强）</li>
+<li data-page-node-id="VOsIKgrtD3NrlXoAC3wfHh">可实时修改 DLSS / DLSS-D 预设</li>
+<li data-page-node-id="ogII0VXV2EsSkfJTq3WB2R">支持 XeSS v1.3.x 的 Ultra Performance、NativeAA 模式（<strong data-page-node-id="TmlVO3XK01JHXbGxGuK8tr">注意：不使用 XeSS 1.3.x 的默认缩放比例，而是沿用旧版比例</strong>）</li>
+<li data-page-node-id="frl1cHtC8Q3lqCudhLRMmg">提供<a href="Config.zh.md" data-page-node-id="YVby7DuVxdg3Ii8HWEBKhO">游戏内菜单</a>，可实时调节并保存设置（快捷键为 <strong data-page-node-id="rhIT9mBu5CZOI6BYdmBbiy">INSERT</strong>）</li>
+<li data-page-node-id="1XETPHRsA5WU1eibnElSvL">与 <a href="https://www.nexusmods.com/site/mods/757" data-page-node-id="ZQP1YtusBLOed7mnD9p5Zj">DLSS Enabler</a> 完全集成，支持 DLSS-FG</li>
+<li data-page-node-id="aBOGOLjtDkB35aswuF6odW">为所有 DX12 与 DX11 超分后端提供 <strong data-page-node-id="kHSVfq4181HJgRK5eU36I8">RCAS</strong> 锐化与 <strong data-page-node-id="ABMEHUBsCMYCYIIHeUsNOA">MAS</strong>（运动自适应锐化，Motion Adaptive Sharpening）支持</li>
+<li data-page-node-id="Wle16d2juNOpijH3cTTpBG">为运行于 DX12 与 DX11 的后端提供 <strong data-page-node-id="CFOtFA4N6xHKKgp83xVZfU">输出缩放（Output Scaling）</strong> 选项（0.5x 至 3.0x）</li>
+<li data-page-node-id="x3uY8QOmuD4H1L046C6oYF">支持 DXGI 伪装（以 <code data-page-node-id="uNI6GU3Dq1cphk5iaxA53A">dxgi.dll</code> 方式运行时），伪装成 Nvidia 显卡（并带有 XeSS 检测，可在 Intel Arc 显卡上启用 XMX）</li>
+<li data-page-node-id="v2Cv9Ye4CD6UdUHKItC5vV">支持 Vulkan 伪装（需在 <code data-page-node-id="wW4JvLGyAtEGIEtFRFzmfJ">nvngi.ini</code> 中启用），伪装成 Nvidia 显卡（在《毁灭战士：永恒》中无效）</li>
+<li data-page-node-id="k93phUMTeHwBem247klNn5">支持加载指定的 <code data-page-node-id="U3Zo2aC60bSqFciha7p73T">nvapi64.dll</code> 文件（非 nvngx 模式下）</li>
+<li data-page-node-id="FaUSECYlxebGMMq5Dndzsz">支持加载指定的 <code data-page-node-id="pgC7ylY74DnC9DsckMyt6n">nvngx_dlss.dll</code> 文件（非 nvngx 模式下）</li>
+<li data-page-node-id="zl6VCpxYqHFVQi0AeZbcow">支持覆盖缩放比例（Upscaling Ratios）</li>
+<li data-page-node-id="QKNPBMrGZr4Iiv6hgSEyxU">支持 DRS 范围覆盖</li>
+<li data-page-node-id="6he1qA1B678tAo3xLaHxFT">针对虚幻引擎 + AMD 显卡的<a href="Config.zh.md" data-page-node-id="iMEHr4YTTMl5VqTNLInemH">彩色灯光问题</a>自动修复</li>
+<li data-page-node-id="8IC8tLC40pNWJzMmvs5YYF">针对<a href="Config.zh.md" data-page-node-id="FhY0vKosuRWDlOqIO7vHL6">曝光纹理（exposure texture）信息缺失</a>的自动修复</li>
+<li data-page-node-id="dSyzqbaBz9XIHV82XCftAH">可修改游戏中的 <a href="Config.zh.md" data-page-node-id="uPIpkgOxbgB6dbhG8gDUhv">Mipmap Lod Bias</a> 值</li>
+<li data-page-node-id="VzYIzjqhauiz4PCOoIcehu">支持 <a href="https://github.com/FakeMichau/fakenvapi" data-page-node-id="VZ6giUCQyRo7X9Rt9DxCIx">Fakenvapi</a> 集成，启用 Reflex 钩子并注入 Anti-Lag 2 或 LatencyFlex（LFX）</li>
+<li data-page-node-id="FrHezabw1oBiZbP91zhCVU">支持 Nukem 的 FSR 帧生成模组 <a href="https://github.com/Nukem9/dlssg-to-fsr3" data-page-node-id="30u1gg5zH7GychLykvc9L6">dlssg-to-fsr3</a>（自 0.7.7 版起）</li>
+</ul>
+<p data-page-node-id="Gg74O1amTvjRpvqIFl5iMh"><strong data-page-node-id="GRh9HEy7nUEvZTdnhWeCGO">为绕过 DLSS 3.7 的签名校验要求，OptiScaler 采用了 <a href="https://www.nexusmods.com/site/mods/757?tab=description" data-page-node-id="wsJRW4DF0AfALhrRApYq5J">DLSS Enabler</a> 作者 </strong>Artur<strong data-page-node-id="3giJgcxniy3M86Dcft5mvl"> 开发的方法。</strong></p></section><section id="sec2" data-page-node-id="wK9WZ1t8qcbLpR4OXjDXEv"><div class="doc-src" data-page-node-id="33PAF70ZnCxL4kZnouoRst">Config.zh.md · 原文链接见各文件顶部</div><h1 id="_1" data-page-node-id="C5uCBIyyn7vF52NFELENgL">配置说明</h1>
+<blockquote data-page-node-id="bSPJERItFHPkWwUGeekBjq">
+<p data-page-node-id="SFy0tCuLQ2V4w01JpY0JO2">原文：<a href="https://github.com/OptiScaler/OptiScaler/blob/master/Config.md" data-page-node-id="brgYX4x73xHVMMmhVRu11P">Config.md</a> | 中文翻译仅供参考</p>
+</blockquote>
+<p data-page-node-id="n1rD5UnP7qeJkDmlIScI45">本文档将尽可能详细地解释 <code data-page-node-id="p1ny81Luua68An5mrFRyKY">OptiScaler.ini</code> 以及游戏内菜单（打开菜单的快捷键为 <strong data-page-node-id="XPaRApudyduCbyRtxHGbpK">INSERT</strong>）中的各项设置。</p>
+<p data-page-node-id="6UFFMOgl6EMcVxziXRnPtu"><img alt="游戏内菜单" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/menu043.png" data-page-node-id="rYQQSG5cw01L0dpI3s8k8g" /></p>
+<h3 id="upscalers" data-page-node-id="rWKCUmQgR4nHXJI5ETDdYF">超分方案（Upscalers）</h3>
+<p data-page-node-id="rLFKvEGYDJReCpldNfoNbG">OptiScaler 支持 DirectX 11、DirectX 12 和 Vulkan 三种 API，并提供多种超分后端。你可以在 <code data-page-node-id="fS6VNXB9vqSMpFUXjBKNnQ">OptiScaler.ini</code> 文件的 <code data-page-node-id="r0TRPdRXF6D2xBHkrJZHLS">[Upscalers]</code> 部分选择使用哪种超分方案。</p>
+<pre data-page-node-id="qc6LYwziXAOno9fKnokCEq"><code class="language-ini" data-page-node-id="HMy9rAyHniGRasU88EFcsR">[Upscalers]
+; 为 DX11 游戏选择超分方案
+; 可选：fsr22（原生 DX11）、xess（借助 DX12）、fsr21_12（DX11 借助 DX12）或 fsr22_12（DX11 借助 DX12）
+; 默认（auto）为 fsr22
+Dx11Upscaler=auto
+
+; 为 DX12 游戏选择超分方案
+; 可选：xess、fsr21 或 fsr22
+; 默认（auto）为 xess
+Dx12Upscaler=auto
+
+; 为 Vulkan 游戏选择超分方案
+; 可选：fsr21 或 fsr22
+; 默认（auto）为 fsr21
+VulkanUpscaler=auto
+</code></pre>
+<ul data-page-node-id="q5BS3ohKG8wwl27nHyAtnj">
+<li data-page-node-id="kUbG4mNbq70CB5OCTGSAPo"><code data-page-node-id="aLZEpfbtT1r3l6FHTArv1M">fsr21</code> 表示 FSR 2.1.2</li>
+<li data-page-node-id="VAyBeikKtGhmGxBJue6zWX"><code data-page-node-id="KaBmIvHwFiC0T8FMUUcvCD">fsr22</code> 表示 FSR 2.2.1</li>
+<li data-page-node-id="hFwAWm9NQZKqnvllEdQk2L"><code data-page-node-id="3QCxYf2O0gU91UFBpHQXFv">xess</code> 表示 XeSS</li>
+</ul>
+<p data-page-node-id="AhhJQG2acqGgh7B3WZ4znH"><em data-page-node-id="bC0aEwS5QQFpFC4IPapqni">对于 DirectX11，<code data-page-node-id="bZH6WBLKcnaWJjNfxvW3Ua">fsr21_12</code>、<code data-page-node-id="aVxhgAC4McEMFHKHhkcEFY">fsr22_12</code> 和 <code data-page-node-id="WAm3pRlUt3oELxNoAcRR0P">xess</code> 这几个选项需要借助一个后台 DirectX12 设备来使用仅支持 DX12 的超分方案。此方法有约 10%–15% 的性能损失，但能提供更多超分选择。此外，原生 DX11 版 FSR 2.2.1 是从 Unity 渲染器反向移植的，自身存在一些问题，OptiScaler 规避了其中一部分。</em></p>
+<p data-page-node-id="jDNpwSIKOeGyA6vY98CgxB">在游戏内菜单的 <code data-page-node-id="2EXhONbPlztZvZ9X7hu9sK">Upscalers</code> 部分也可以选择超分方案。</p>
+<p data-page-node-id="mcwLpvYESWBfhUz81fPixH"><img alt="超分选择界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/Upscalers.png" data-page-node-id="kpJxflmNvND9xO3ekEKhlb" /></p>
+<h3 id="pseudo-supersampling" data-page-node-id="HdL769Gkd71yU6bJ5F6keU">伪超采样（Pseudo SuperSampling）</h3>
+<p data-page-node-id="HaLsCL6XbXi0ePy7qTmFoX">从 OptiScaler 0.4 开始，<code data-page-node-id="3EwU6CrN2FEo6D4e14uUc3">[Upscalers]</code> 下新增了伪超采样（伪超级采样）选项：</p>
+<pre data-page-node-id="99h1eAE7oHnOORnCucZ6YG"><code class="language-ini" data-page-node-id="26HFMQJI9BACXCqchgeXHk">[Upscalers]
+; 为 DX12 后端及&quot;DX11 借助 DX12&quot;的后端启用伪超采样
+; true 或 false - 默认（auto）为 false
+SuperSamplingEnabled=auto
+
+; 伪超采样倍率
+; 0.0 - 5.0 - 默认（auto）为 2.5
+SuperSamplingMultiplier=auto
+</code></pre>
+<p data-page-node-id="LgLjDyGKPzw8R630QLHjDd">举例说明：假设游戏运行在 1080p，DLSS 预设选择 <code data-page-node-id="jTGNMk1v9ZVZDLbHFJrXgN">Quality</code>，游戏会渲染一张 720p 的画面，连同其他必要输入信息一起交给超分器，输出 1080p 的画面。</p>
+<p data-page-node-id="R0zPgaWjJaNK7gR6IdpOGj">如果开启伪超采样，则会用 <code data-page-node-id="rZSxMKFCyRHqnjKLgSheNz">SuperSamplingMultiplier</code> 来计算超分器的目标渲染尺寸。以 720p 输入、默认倍率 2.5 为例，目标为 1800p。也就是说，超分器会把画面放大到 1800p 而不是 1080p，然后再由 OptiScaler 把输出画面降采样回 1080p。</p>
+<p data-page-node-id="8W80SgG4bP7tvHiHldp9Tc"><img alt="伪超采样示意图" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/pss.png" data-page-node-id="OrpQn1UkwQBxBDohfZHcql" /></p>
+<p data-page-node-id="7B7evmE5jKor9tNDCEVB3B">由于超分目标分辨率更高，相比普通超分会有一定性能损失。但主观画质上，它可以以更高的性能档位接近 DLAA 的效果。</p>
+<p data-page-node-id="9MRkOtxtv6A3HY9LvhMLQ4">该选项可在游戏内菜单中实时调整。</p>
+<p data-page-node-id="duLtFtiMYZ7B4FsintpPuV"><img alt="伪超采样配置" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/pss_config.png" data-page-node-id="2yxlZt3sl3zR1s4D2YQNkh" /></p>
+<h3 id="dx11withdx12" data-page-node-id="dQXsrOoujtWk3Qz4OEREDE">Dx11withDx12 同步设置</h3>
+<p data-page-node-id="jmljsb2Zb0qQxV9SNTJLG1">对于 DirectX11 使用 <code data-page-node-id="Zx9gnT2hpURJqZKiOrEW2J">fsr21_12</code>、<code data-page-node-id="XKR29Z59sSOGOfi56vn2XG">fsr22_12</code> 和 <code data-page-node-id="JVgQ8ZOMyNsD9mYONyOc0X">xess</code> 超分选项的情况，OptiScaler 会借助一个后台 DirectX12 设备来使用这些仅支持 DX12 的超分方案。这是一个非常小众的功能，在不稳定的 GPU 驱动上（尤其是 Intel）可能出问题。为了缓解或防止崩溃和画面异常，可以使用以下选项。</p>
+<pre data-page-node-id="9ZNlH6SkBpt0xuvwt2DQO1"><code class="language-ini" data-page-node-id="P3VEExBCk8CBHyBokCOxKa">[Dx11withDx12]
+; &quot;DX11 借助 DX12&quot;的同步方式
+;
+; 有效值为：
+;   0 - 无同步                       （最快，最容易出错）
+;   1 - Fence
+;   2 - Fences + Flush
+;   3 - Fences + Event
+;   4 - Fences + Flush + Event
+;   5 - 仅 Query
+
+; 默认（auto）为 1
+TextureSyncMethod=auto
+
+; 默认（auto）为 5
+CopyBackSyncMethod=auto
+
+; 输出回拷同步发生在 Dx12 执行之前还是之后
+; true 或 false - 默认（auto）为 true
+SyncAfterDx12=auto
+
+; 在创建 D11wDx12 功能时延迟部分操作以提高兼容性
+; true 或 false - 默认（auto）为 false
+UseDelayedInit=auto
+</code></pre>
+<p data-page-node-id="BbLlmex2dVqHRNpOGUGBxx">下图展示了"Dx11 借助 Dx12"超分流程。黄色圆圈为同步点（或可能的同步点）。<code data-page-node-id="KfoRoBsYJFmrwaosnC7Woc">SyncAfterDx12</code> 决定第二次同步发生的时机。</p>
+<p data-page-node-id="kCE3lI5mBZGhDRhLmoQRnl"><img alt="dx11 with dx12 流程图" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/Dx11wDx12.png" data-page-node-id="O3IM35Dvkl8NwSk2HNvDY7" /></p>
+<ul data-page-node-id="EAELNKSTHTGCE6teHKzzWv">
+<li data-page-node-id="3Xi9cIGSSenvv2hk18xJFB"><code data-page-node-id="7iFp2lGLz20fkrwe1Yvw33">无同步</code>：顾名思义。</li>
+<li data-page-node-id="LfOhpAhNln9jfDvAoFduAt"><code data-page-node-id="BSU2J7gQA9fDGIbGEvbdzD">Fence</code>：使用共享 <code data-page-node-id="EnF40HpyiFVjy6DOgIx5vq">Fence</code>（Signal &amp; Wait）同步，发生在 GPU 上，速度相当快。</li>
+<li data-page-node-id="Prmi71WmakQooLru6cn3W7"><code data-page-node-id="I5vPoC8ELvgb6VKdyMF11h">Fence + Event</code>：使用共享 <code data-page-node-id="sYwSC9VrjkfICuYC3Ixbeu">Fence</code>（Signal &amp; Event）同步，<code data-page-node-id="vn70XU3kuT4Ae3w2Yqs9v9">Event</code> 需要在 CPU 上等待，速度较慢。</li>
+<li data-page-node-id="cbfy4O1GTZhfdtFHopodNk"><code data-page-node-id="DatM28wK4LyuBmPC7xgy4B">Flush</code>：Signal 共享 Fence 后，Flush DX11 的 DeviceContext。</li>
+<li data-page-node-id="0UN4wmyNAJ5iOEFpmAuIXV"><code data-page-node-id="SaAkpc2iNm8ZoVGGyWVlGN">仅 Query</code>：使用 DX11 <code data-page-node-id="dGr7Egihiw0DK4JqiqrE45">Query</code> 同步，一般比 <code data-page-node-id="r4MfyHDIyPsO8bdaB7fOYr">Event</code> 快，但比 <code data-page-node-id="gDQ2P80U3DcFI9cFArEVEi">Fence</code> 慢。</li>
+</ul>
+<p data-page-node-id="1zJFH3YioXR4oCHHZ32hDJ">当使用 <code data-page-node-id="nTfh0RALLe0mo7NfvuM6QD">Event</code> 同步输出时，<code data-page-node-id="4stdg2aGakaLiidi9FLxKT">SyncAfterDx12=false</code> 通常性能更好。</p>
+<p data-page-node-id="kH2NyDjPJx2FIhhdy0w4GA"><strong data-page-node-id="AkpLkNbUtvFsXvwtMNk4RM">这些设置与游戏和硬件相关。默认值是在性能与画面稳定之间的折中，想要更高性能可能需要针对每个游戏自行微调。</strong></p>
+<p data-page-node-id="C2nVS1eIxKnsdJ5hGXMvkE">这些可在游戏内菜单中实时调整（<code data-page-node-id="tDMDJrKiObSqxm7Zr9P4kO">UseDelayedInit</code> 除外）。</p>
+<p data-page-node-id="JTtpW5xsuuA9VKD2qpxVnK"><img alt="dx11 同步设置界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/dx11wdx12menu.png" data-page-node-id="cbdx5w23YgL5WhnXvCCv34" /></p>
+<h3 id="xess" data-page-node-id="CG3dxp0xwUpdFANlW0Gbyx">XeSS 设置</h3>
+<pre data-page-node-id="SUCUUJUVjsmS3rnx6suud2"><code class="language-ini" data-page-node-id="CAHRAOgjfrG4hOLDLZn6Hf">[XeSS]
+; 在初始化前预构建 XeSS 管线
+; true 或 false - 默认（auto）为 true
+BuildPipelines=auto
+
+; 选择 XeSS 网络模型
+; 0 = KPSS
+; 1 = Splat
+; 2 = Model 3
+; 3 = Model 4
+; 4 = Model 5
+; 5 = Model 6
+;
+; 默认（auto）为 0
+NetworkModel=auto
+
+[CAS]
+; 为 XeSS 启用 CAS 锐化
+; true 或 false - 默认（auto）为 false
+Enabled=auto
+
+; 输入和输出的色彩空间转换
+; 可选值见文末 - 默认（auto）为 0
+ColorSpaceConversion=auto
+</code></pre>
+<p data-page-node-id="iARr6PE0iBWZ56QJG5q2gy"><code data-page-node-id="jecGDuWtYbW1m4JXi0phSu">BuildPipelines</code> 参数允许在创建上下文时预构建 XeSS 管线，避免之后游戏过程中卡顿。</p>
+<p data-page-node-id="PohWMd9hF2V0NLbf8Z4cpT"><code data-page-node-id="mtFbFZMisIVuYxu24WBDJu">NetworkModel</code> 用于选择 XeSS 超分使用的网络模型。<strong data-page-node-id="ujrRoOmz4ICsWRqkO5G0rw">（目前对超分后的画面没有可见影响）</strong></p>
+<h4 id="cas" data-page-node-id="7EZ3t5hvjfLAntGdDLGXbT">CAS</h4>
+<p data-page-node-id="rgCqxKbp6L2Igu2mk5JFGF">XeSS 通常比其他超分方案输出的画面更"软"，且没有自带锐化选项来改善。因此 OptiScaler 允许你对最终画面应用 AMD 的 CAS 锐化滤镜，以平衡 XeSS 偏柔和的观感。不过 CAS 并不完美，在某些游戏中可能引发伪影或问题，例如泛光（Bloom）消失、画面色调偏移，甚至黑屏无图像。</p>
+<p data-page-node-id="IhWCz06wPmapPgCMELRYu5"><img alt="CAS 示例" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/cas.png" data-page-node-id="2XEt2VhAlk20rzcPXvXzb7" /></p>
+<ol data-page-node-id="5cMvHGuu5Cn75gtqNqoC2T">
+<li data-page-node-id="OsuMQcFmqf5OkH4AEyBC27">泛光效果消失</li>
+<li data-page-node-id="MBmGRdOYNKQx6E7VeSwoC9">画面色调改变</li>
+</ol>
+<p data-page-node-id="GmoVVv9yIQhS8SLcvhiM2P"><code data-page-node-id="H3XRuw05bz5yEGpO0IQ741">ColorSpaceConversion</code> 用于修复色彩空间转换问题，但<strong data-page-node-id="BGnT536sFQSp7M0ISrBHvt">几乎所有情况下</strong>默认值都能正常工作。</p>
+<p data-page-node-id="tZ6JVdhFggOx8HuYLXX1ZE">可在游戏内菜单中实时调整。</p>
+<p data-page-node-id="HeiCLhQCDFimppuWzSQZHl"><img alt="xess 设置界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/xess.png" data-page-node-id="EdNA2jYywwyOdPLRJEjlGY" /></p>
+<p data-page-node-id="Mhobk8CI2WJsT5oFrrbjDS"><code data-page-node-id="houZICNza2rnyEdRm7nFFr">Dump</code> 选项用于调试，会把 XeSS 的输入输出参数和纹理转储（dump）到游戏目录。</p>
+<h3 id="fsr" data-page-node-id="mywCm9r873PQ5GUTDzWhr4">FSR 设置</h3>
+<pre data-page-node-id="ykGLmOPLRPzPZCvnrsbzkm"><code class="language-ini" data-page-node-id="FTAx1zrotC5oiVYZHXzifi">[FSR]
+; 0.0 至 180.0 - 默认（auto）为 60.0
+VerticalFov=auto
+
+; 若未定义垂直 FOV，将用此值计算垂直 FOV
+; 0.0 至 180.0 - 默认（auto）为关闭
+HorizontalFov=auto
+</code></pre>
+<p data-page-node-id="j0cEICDGpjrXplEl35wGKp">为提升画质，可以尝试用这些设置匹配你游戏的垂直或水平 FOV。默认垂直 FOV 为 60°，大多数情况下效果不错。</p>
+<p data-page-node-id="apZSMNkyvwgFNmFXDXGJWR">可在游戏内菜单中实时调整。</p>
+<p data-page-node-id="COqd0pc6kzCfE4QtO7v7lu"><img alt="fsr 设置界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/fsr.png" data-page-node-id="xAftQGX60emngMVelqJXLw" /></p>
+<h3 id="sharpness" data-page-node-id="rIgADNzA9GcYg1ffDTvxEo">锐度（Sharpness）</h3>
+<p data-page-node-id="zHvnFawqMATpF2JwTRbjGT">DLSS 早期有锐化选项，后来被移除了。因此有的游戏有锐度滑条，有的没有。通过这个选项，你可以关闭或开启最终画面的锐化。FSR 自带锐化，而 XeSS 需要开启上面的 CAS 选项。</p>
+<pre data-page-node-id="Yvob7mYHD2KRvJB4qWAx2q"><code class="language-ini" data-page-node-id="W2KGDu8lxPsmtViIjviDcw">[Sharpness]
+; 用固定锐度值覆盖 DLSS 的锐度参数
+; true 或 false - 默认（auto）为 false
+OverrideSharpness=auto
+
+; 锐化强度
+; 取值范围 0.0 到 1.0 - 默认（auto）为 0.3
+Sharpness=auto
+</code></pre>
+<p data-page-node-id="2werPbiRYGaBPxVFuqBaM5">可在游戏内菜单中实时调整。</p>
+<p data-page-node-id="0JyIF4QnNrWVClw0M01Ddf"><img alt="锐度设置界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/sharpness.png" data-page-node-id="VEWMjtSpfbWMDewVN82v6G" /></p>
+<h3 id="upscaling-ratios" data-page-node-id="RHShCGhUpAwRnWxgFhpOei">超分比例（Upscaling Ratios）</h3>
+<p data-page-node-id="FVXHj1pzMzQPRQiLpqmQ52">OptiScaler 提供多个覆盖和锁定超分比例的选项。</p>
+<h4 id="upscale-ratio-override" data-page-node-id="xGD9ZMscExHRLqyTpt8oDe">超分比例覆盖（Upscale Ratio Override）</h4>
+<p data-page-node-id="bjKs0igj5rsiJiUtQanEtM"><code data-page-node-id="zBH9FqYNY6demx0uFRwm7r">UpscaleRatioOverride</code> 可以为所有画质预设统一指定一个超分比例。</p>
+<pre data-page-node-id="qFARTZEcIMnkFBPKjP9LvR"><code class="language-ini" data-page-node-id="c5fjTD82zCsB9MDPFNxYjK">[UpscaleRatio]
+; 设为 true 以启用内部渲染分辨率覆盖
+; true 或 false - 默认（auto）为 false
+UpscaleRatioOverrideEnabled=auto
+
+; 设为 true 以启用&quot;将 DRS 最大分辨率限制为覆盖比例&quot;功能
+; true 或 false - 默认（auto）为 false
+DrsMaxOverrideEnabled=auto
+
+; 设置强制使用的超分比例
+; 默认（auto）为 1.3
+UpscaleRatioOverrideValue=auto
+</code></pre>
+<p data-page-node-id="2NgPRPCuAtqrjw5EZvO1gC">可以在游戏内菜单中修改并保存，但通常需要重启游戏或改变分辨率后才生效。</p>
+<p data-page-node-id="aqY2dKMq9nszUBPsbg2WO3"><img alt="超分比例界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/us_ratio.png" data-page-node-id="hLhwBV9it8jWFaFYszYDah" /></p>
+<h4 id="quality-ratio-override" data-page-node-id="qZUBQwCRXjaA64jQDWjSgk">画质档位比例覆盖（Quality Ratio Override）</h4>
+<p data-page-node-id="TsLObDP60AnasfWv64veZX"><code data-page-node-id="CFuO7dqkoIvVzSmAhSW6el">QualityRatioOverride</code> 可以为每个画质档位分别覆盖超分比例。</p>
+<pre data-page-node-id="ftggO9RKuKbEWAEwAnMySp"><code class="language-ini" data-page-node-id="THtclx9W505bPTrbp5me2T">[QualityOverrides]
+; 设为 true 以启用自定义画质档位覆盖
+; true 或 false - 默认（auto）为 false
+QualityRatioOverrideEnabled=auto
+
+; 为每个画质档位设置自定义超分比例
+;
+; 默认（auto）值：
+; Ultra Quality（超高画质） : 1.3
+; Quality（画质）           : 1.5
+; Balanced（平衡）          : 1.7
+; Performance（性能）       : 2.0
+; Ultra Performance（超高性能） : 3.0
+QualityRatioUltraQuality=auto
+QualityRatioQuality=auto
+QualityRatioBalanced=auto
+QualityRatioPerformance=auto
+QualityRatioUltraPerformance=auto
+</code></pre>
+<p data-page-node-id="bqHDFUOAPM3fOZEbtbfyFU"><strong data-page-node-id="ENVq53097vItblk2khqNpE">如果两种覆盖同时启用，<code data-page-node-id="wyVT2AElmqQBpvHlWL8iYE">UpscaleRatioOverride</code> 的优先级高于 <code data-page-node-id="H1Gc05fGxG2v1XoU1NLDiz">QualityRatioOverride</code>。</strong></p>
+<p data-page-node-id="khto8wcHI82Q17glips6bt">启用 <code data-page-node-id="8ybaBdiXnw3kANm6l8Ebtz">DrsMaxOverrideEnabled</code> 后，对于支持 DRS（动态分辨率缩放）的游戏，会把最大内部渲染分辨率限制为默认渲染分辨率而非显示分辨率——相当于变相禁用 DRS。它对 <code data-page-node-id="3caRkiF0hA6iqFWHRlKb6E">QualityRatioOverride</code> 和 <code data-page-node-id="0qGECN4CFIc9Z6eYUFE2oY">UpscaleRatioOverride</code> 均有效。</p>
+<p data-page-node-id="TKrZbh5PffEsppuKgv5QY7">可以在游戏内菜单中修改并保存，但通常需要重启游戏或改变分辨率后才生效。</p>
+<p data-page-node-id="tWV8C5a2njbHXjVFxlsq03"><img alt="画质比例界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/q_ratio.png" data-page-node-id="Wvd9H6Lv8RZECBvgBEWHX6" /></p>
+<h3 id="init-flags" data-page-node-id="Bng9ZK81rED2FT8rPCujb5">初始化标志（Init Flags）</h3>
+<p data-page-node-id="2GvhEquvIQWce8TlDYcuNp">这些设置允许覆盖 DLSS 的初始化标志（init flags），用于修复某些问题。</p>
+<pre data-page-node-id="xfZYxoM4XFqqX5IvECUUsw"><code class="language-ini" data-page-node-id="eqQIO9fMUgHhxikbD47dTM">[Depth]
+; 强制向初始化标志添加 INVERTED_DEPTH
+; true 或 false - 默认（auto）为 DLSS 自身的值
+DepthInverted=auto
+
+[Color]
+; 强制向初始化标志添加 ENABLE_AUTOEXPOSURE
+; 部分虚幻引擎游戏需要此项，可修复颜色问题（尤其是暗部区域）
+; true 或 false - 默认（auto）为 DLSS 自身的值
+AutoExposure=auto
+
+; 强制向初始化标志添加 HDR_INPUT_COLOR
+; true 或 false - 默认（auto）为 DLSS 自身的值
+HDR=auto
+
+[MotionVectors]
+; 强制向初始化标志添加 JITTERED_MV
+; true 或 false - 默认（auto）为 DLSS 自身的值
+JitterCancellation=auto
+
+; 强制向初始化标志添加 HIGH_RES_MV
+; true 或 false - 默认（auto）为 DLSS 自身的值
+DisplayResolution=auto
+
+[Hotfix]
+; 强制从初始化标志中移除 RESPONSIVE_PIXEL_MASK
+; true 或 false - 默认（auto）为 true
+DisableReactiveMask=auto
+</code></pre>
+<p data-page-node-id="V1XzZdu2tHK8gSRQ0gxg4K">启用 <code data-page-node-id="oGGzjItbDE80atIEphKMBC">AutoExposure</code> 有助于改善画面过暗或颜色发白的问题。</p>
+<p data-page-node-id="5j4zZEAoKWGD9YE4IboOIO"><img alt="曝光修复示例" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/exposure.png" data-page-node-id="72bcMlQMjYlXJ5B9jHmyvQ" /></p>
+<p data-page-node-id="4kwIv9bhLrPfm00LPCLNv1">有反馈称启用 <code data-page-node-id="fDN4o5dAUaXmtUKiye1X9E">HDR</code> 可以改善某些游戏中的紫色偏色。</p>
+<p data-page-node-id="JCYiQa5Vyo3MrhKLbkoPHz">启用 <code data-page-node-id="lM7KFaHjA0vt5wS5Xqt2oN">DisableReactiveMask</code> 在部分游戏中对 FSR 后端有帮助，但通常弊大于利，因此默认关闭。</p>
+<p data-page-node-id="0tDKzqQgPuwkOUOx0Kz9ha">有些游戏可能设置错误的游戏运动向量大小标志，导致镜头移动时出现过度动态模糊。开启或关闭 <code data-page-node-id="zCO2wmFSmHQzzA5ayFRxIK">DisplayResolution</code> 可能有助于解决。</p>
+<p data-page-node-id="yTTMAohARlKA53A1mOgLV6"><img alt="运动向量标志错误示例" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/mv_wrong.png" data-page-node-id="fXD74i96BT6gSH3P5bUNqW" /></p>
+<p data-page-node-id="CSb53F0MPKkrVednHL9ZjA">可在游戏内菜单中实时调整。</p>
+<p data-page-node-id="gjIYP29L8GuEU8ryuWcKLV"><img alt="初始化标志界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/init_flags.png" data-page-node-id="SuUHl7z5M5a6WcRreCFi8S" /></p>
+<h3 id="resource-barriers-dx12" data-page-node-id="I61UdzJadlHhHhIAqAHCbX">资源屏障（Resource Barriers，仅 DX12）</h3>
+<p data-page-node-id="gDGiSHGnkURBlDyDwfGYY0">有些游戏（尤其是虚幻引擎）把处于错误状态的输入资源传给 DLSS，导致画面问题（尤其在 AMD 硬件上）。通常 OptiScaler 会尝试检测引擎类型并自动启用对应修复，但有些游戏上报的引擎信息不正确。此时下面的 ini 参数可以帮助解决问题。</p>
+<p data-page-node-id="YCkqns8pXWbkCjBHUOUZTz"><img alt="画面异常示例" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/christmas.png" data-page-node-id="g84yRthfEBBwuMO2a5pFY6" /></p>
+<p data-page-node-id="5ruuN6OdyLkNJSbDgarTCy"><strong data-page-node-id="GyoJtIhgi1DTRFoVMUkjIM">⚠️ 在这里设置错误的资源状态可能导致崩溃！</strong></p>
+<pre data-page-node-id="LaRRx7K3jec3Jh31y7g2vc"><code class="language-ini" data-page-node-id="9bpuYBwAxBin7wZViU6vVI">[Hotfix]
+; 颜色纹理的资源状态修复，用于解决 AMD 显卡上的彩虹色问题（多为虚幻引擎游戏）
+; 对于 AMD 上的 UE 游戏，设为 D3D12_RESOURCE_STATE_RENDER_TARGET (4)
+; 默认（auto）为禁用状态修正
+ColorResourceBarrier=auto
+
+; 运动向量的资源状态，从此状态修正为 D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE（多用于调试）
+; 默认（auto）为禁用状态修正
+MotionVectorResourceBarrier=auto
+
+; 深度纹理的资源状态，从此状态修正为 D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE（多用于调试）
+; 默认（auto）为禁用状态修正
+DepthResourceBarrier=auto
+
+; 颜色蒙版纹理的资源状态，从此状态修正为 D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE（多用于调试）
+; 默认（auto）为禁用状态修正
+ColorMaskResourceBarrier=auto
+
+; 曝光纹理的资源状态，从此状态修正为 D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE（多用于调试）
+; 默认（auto）为禁用状态修正
+ExposureResourceBarrier=auto
+
+; 输出纹理的资源状态，从此状态修正为 D3D12_RESOURCE_STATE_UNORDERED_ACCESS（多用于调试）
+; 默认（auto）为禁用状态修正
+OutputResourceBarrier=auto
+</code></pre>
+<p data-page-node-id="Zhj1pcYP7tZL34uFM8coEr">可在游戏内菜单中实时调整。</p>
+<p data-page-node-id="oCrA2n6N11FfaNyIQYnVAh"><img alt="资源屏障界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/rb.png" data-page-node-id="zjiFJ2s9rinc9My6yIeZRJ" /></p>
+<h3 id="mipmap-lod-bias-dx12" data-page-node-id="tLjluOT3eGSRlQwoXiIr0U">Mipmap LOD Bias 覆盖（仅 DX12）</h3>
+<p data-page-node-id="sdSbO5FSsM2uu83MkxRA5S">为了获得更清晰的纹理，可以通过此设置覆盖 <code data-page-node-id="g3pmp1z1fL8VW2cFi1NIvP">MipmapLodBias</code>。-15 最锐利，+15 最模糊。</p>
+<pre data-page-node-id="yQ3lRQDspedm1OZjlQHxOm"><code class="language-ini" data-page-node-id="hqrXlHPysf6GpVsWi6T8Fe">[Hotfix]
+; 覆盖纹理的 mipmap lod bias
+; -15.0 - 15.0 - 默认（auto）为禁用
+MipmapBiasOverride=auto
+</code></pre>
+<p data-page-node-id="TPoc2Kxqxg2O9bv1ajuoLr"><strong data-page-node-id="6f34Dy7jxWnBainkIMwuUi">调整 MipmapLODBias 会影响性能！</strong></p>
+<p data-page-node-id="DLmA19LqYQLyD4jZpFKoZZ">可在游戏内菜单中调整，需要更改分辨率后才会生效。</p>
+<p data-page-node-id="yDyj5VDNRrkJxVyOFTAVY9"><img alt="mipmap 界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/mipmap.png" data-page-node-id="4YIlZu4hc3toGYh1AUBraI" /></p>
+<h3 id="restore-root-certificates-dx12" data-page-node-id="7bACzvzCLBFSrq8g7FjrLQ">恢复根签名（Restore Root Certificates，仅 DX12）</h3>
+<p data-page-node-id="AYW8WAuM41IawMipFYmAFF">此热修复基于原版 CyberFSR2 的恢复 ComputeRootSignature 逻辑，我还额外加了恢复 ComputeRootSignature 的选项。目前我还没发现有游戏需要这些选项。</p>
+<pre data-page-node-id="w681TXqVacqKwOTwY3y0PY"><code class="language-ini" data-page-node-id="ADuGlSwGmOucBp6Eg6es7n">[Hotfix]
+; 在超分完成后恢复最后使用的 compute 签名
+; true 或 false - 默认（auto）为 false
+RestoreComputeSignature=auto
+
+; 在超分完成后恢复最后使用的 graphics 签名
+; true 或 false - 默认（auto）为 false
+RestoreGraphicSignature=auto
+</code></pre>
+<p data-page-node-id="7YmdxS6i4YlGZns0QzKnSC">可在游戏内菜单中实时调整。</p>
+<p data-page-node-id="QEPIWuvjUCWhrWt945ZCi6"><img alt="根签名界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/cs.png" data-page-node-id="4ZBsiXyzjJjseoClb4tZpn" /></p>
+<h3 id="logging" data-page-node-id="TX9YJwOFpEKFNofem8ylGX">日志（Logging）</h3>
+<pre data-page-node-id="TQh5yCn0hvmgy66p3dMfYw"><code class="language-ini" data-page-node-id="lYnyEFQfCKB0MxgZRvULlP">[Log]
+; 日志开关
+; true 或 false - 默认（auto）为 true
+LoggingEnabled=auto
+
+; 日志文件，如未指定则在当前目录生成 log_xess_xxxx.log
+;LogFile=./CyberXess.log
+
+; 文件日志的详细级别
+; 0 = Trace / 1 = Debug / 2 = Info / 3 = Warning / 4 = Error
+; 默认（auto）为 2 = Info
+LogLevel=auto
+
+; 输出日志到控制台（出于性能考虑，控制台日志级别始终为 2 (Info)）
+; true 或 false - 默认（auto）为 false
+LogToConsole=auto
+
+; 输出日志到文件
+; true 或 false - 默认（auto）为 false
+LogToFile=auto
+
+; 输出日志到 NVNGX API
+; true 或 false - 默认（auto）为 false
+LogToNGX=auto
+
+; 打开控制台窗口显示日志
+; true 或 false - 默认（auto）为 false
+OpenConsole=auto
+</code></pre>
+<p data-page-node-id="iyp6KSEflFd7xuXlCcbcr9">可在游戏内菜单中实时调整。</p>
+<p data-page-node-id="1soRDiqlB79CWDVdSMRJt8"><img alt="日志界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/logging.png" data-page-node-id="mDjbzsJqANzJMDlBF5zlzc" /></p>
+<h3 id="menu" data-page-node-id="rP6gtBfHTrxqmm4K61OhuU">菜单（Menu）</h3>
+<pre data-page-node-id="SXEWQNezaEFQ1imYV2VRKS"><code class="language-ini" data-page-node-id="UZ84TqBaiHJs6IGKgkSeMl">[Menu]
+; 游戏内 ImGui 菜单缩放
+; 1.0 至 2.0 - 默认（auto）为 1.0
+Scale=auto
+</code></pre>
+<p data-page-node-id="LM1q1oLiVCvUzjXh2FEpxb">可在游戏内菜单中实时调整。</p>
+<p data-page-node-id="vP7To6HeQJ5wkHFv3gVo6T"><img alt="菜单缩放界面" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/ui_scale.png" data-page-node-id="kjFnNlFSUiK49MfJqR9hDT" /></p></section><section id="sec3" data-page-node-id="5IYeRUsK0TIydc4rBvuCUh"><div class="doc-src" data-page-node-id="9V5FU9IeSDSbH4dAt4lPw7">Spoofing.zh.md · 原文链接见各文件顶部</div><h1 id="gpu-spoofing" data-page-node-id="eJIUJyBu9qWHcqf234BALj">GPU 伪装（Spoofing）</h1>
+<blockquote data-page-node-id="ENciigjYrwKPDZqtdyAC0S">
+<p data-page-node-id="tiCxA33gJkoWzPDploEibM">原文：<a href="https://github.com/OptiScaler/OptiScaler/blob/master/Spoofing.md" data-page-node-id="Wa11NSHy4nvXhxCavux3yo">Spoofing.md</a> | 中文翻译仅供参考 <em data-page-node-id="i9TAHlJVAQCkdWPrXBv2Xl">（英文原文标注：本文将会更新）</em></p>
+</blockquote>
+<p data-page-node-id="MCnajGmS7bwnOf77FKB7hN">除了第一代 DLSS2 游戏之外，几乎所有游戏都会对 Nvidia 显卡做某种校验，通过后才会开放 DLSS 选项。
+为了绕过这些校验，模组作者们开发了一些工具。</p>
+<h2 id="windows" data-page-node-id="Ovam59F0baQZxuT4H7HyzT">Windows</h2>
+<h3 id="nvapifakenvapi" data-page-node-id="F6erPyxw9Jsm2T9MUvGLhL">Nvapi（FakeNvapi）</h3>
+<p data-page-node-id="0BLRZSvC12FNgaLzh5CSL2">要伪装 Nvapi 调用，可以使用 FakeNvapi。某些游戏（如《古墓丽影：暗影》等）需要它才能开启 DLSS 支持。</p>
+<p data-page-node-id="wlSGcBNpGgn8ZQIJvd3h5B">另外一个<strong data-page-node-id="DUQEfeJThiyppfKcwSKLV2">重大加分项</strong>：最新版 FakeNvapi 增加了对 AMD AntiLag 2 与 LatencyFlex 的支持，可在支持 Nvidia Reflex 的游戏中降低输入延迟。</p>
+<h5 id="_1" data-page-node-id="OumNzHFCYooB4Ut7DZ8HBx">用法</h5>
+<p data-page-node-id="Fjto4Vj06PP5ZWqZjAqJfk">把 <code data-page-node-id="Scms2GyA5rcQZj1rbmtXGS">nvapi64.dll</code> 放在 OptiScaler 旁边，并在 <code data-page-node-id="ySf7dGSYdhG7RUyDUeA5wQ">OptiScaler.ini</code> 中设置 <code data-page-node-id="CpNE0O33Gjb7SYFP4SXFRc">OverrideNvapiDll=true</code>。注意：仅当 OptiScaler 以 non-nvngx 方式（即不是以 <code data-page-node-id="RIYhIp6Mw9YsgmpOTtF617">nvngx.dll</code> 形式）运行时才有效。</p>
+<p data-page-node-id="4igU9gMnHgQqJB1PR90pxw">不通过 OptiScaler 单独使用时：
+需要把 <code data-page-node-id="VSBdhG0S8Hw2Aydky6Mtf3">nvapi64.dll</code> 文件放到 <code data-page-node-id="z3jPT9CkXaVCCeqcLkdAYB">%WINDIR%\System32</code>，但<strong data-page-node-id="zvpxXoZEdYL0rTCSFHXz6u">请务必小心！</strong>
+* 如果你是 Nvidia 用户，请<strong data-page-node-id="sGtzaKgK87H7Azibqr91lW">先备份原始文件</strong>，模组使用结束后再还原。
+* 切勿在联机游戏中使用此模组，可能导致反作弊问题甚至封号。</p>
+<h5 id="_2" data-page-node-id="fDe5nnxgkXBvW8afKH2jA0">下载</h5>
+<p data-page-node-id="GMwm7jhQT2hTh9j6uc2Z8A"><a href="https://github.com/FakeMichau/fakenvapi/releases" data-page-node-id="XyPoApWoTH4gKiEaa1YQn3">FakeNvapi</a></p>
+<h3 id="dxgi" data-page-node-id="wpoGehbg8mCGX8eCSmWlDy">DXGI</h3>
+<p data-page-node-id="7fWvetJP2vmF42tJ8GCj8y">OptiScaler 内置了 DXGI 伪装选项，在以 non-nvngx 方式（非 <code data-page-node-id="L1CEFMI9aS2K8Uwii5snzp">nvngx.dll</code>）运行时默认启用。</p>
+<h4 id="d3d12-proxy" data-page-node-id="bUkJBMobqURt88pfgYOCq4">d3d12-proxy</h4>
+<p data-page-node-id="2P3UvXXrAGVY8LG1zX8ISM">另外，要伪装 DXGI 适配器校验，也可以使用 d3d12-proxy。这个模组会把你的显卡上报为 RTX 4090。</p>
+<h5 id="_3" data-page-node-id="K6yRVuhMsvRIgeTaGLEc6O">用法</h5>
+<p data-page-node-id="6kLfIBFzMd04Va1JoUGIiA">只需把 dxgi.dll 文件放到游戏可执行文件旁边。</p>
+<h5 id="_4" data-page-node-id="K1TbsAYbw1osHviEx13uaQ">下载</h5>
+<p data-page-node-id="hX5VqpOkpbSiqcXKM1mw4r"><a href="https://github.com/cdozdil/d3d12-proxy/releases" data-page-node-id="f1Iqx6ert7r2cZ5aV93Fy0">d3d12-proxy</a></p>
+<h3 id="vulkan" data-page-node-id="uwzb2sSMTDJJoV5Ed7o8Uy">Vulkan</h3>
+<p data-page-node-id="PHPec48QFDnBEESTqtc5Of">OptiScaler 以 non-nvngx 方式（非 <code data-page-node-id="EhEjA6N7pl39IBBIX6RWtn">nvngx.dll</code>）运行时内置了 Vulkan 伪装选项。
+Vulkan 伪装默认关闭，需要时请在 <code data-page-node-id="ZoN3hS4IEiz3RaJqXZCwh6">OptiScaler.ini</code> 中启用。</p>
+<pre data-page-node-id="tA6PacgJyVmDxV6rDCOBiC"><code class="language-ini" data-page-node-id="oRgkeOOe61gN7AbLTOjQZg">; 启用 Vulkan 的 Nvidia 显卡伪装
+; true 或 false - 默认（auto）为 false
+Vulkan=auto
+
+; 启用 Vulkan 的 Nvidia 扩展伪装
+; true 或 false - 默认（auto）为 false
+VulkanExtensionSpoofing=auto
+</code></pre>
+<h4 id="vulkan-spoofer" data-page-node-id="C9eXeFbeSWbHkqI4rFmeFY">vulkan-spoofer</h4>
+<p data-page-node-id="VzdkNvtLNnyUEurlCdOUR9">另外，要伪装 <code data-page-node-id="N7STc3RWQqoimkQcN7eUMm">GetPhysicalDeviceProperties</code> 校验，可以使用 vulkan-spoofer。这个模组会把你的显卡上报为 RTX 4090。
+兼容性不太稳定：《无人深空》可用（但与最新的 streamline 补丁不兼容），《毁灭战士：永恒》则不可用。</p>
+<h5 id="_5" data-page-node-id="8ZgjgrYTGdwL6c7jNBdUT6">用法</h5>
+<p data-page-node-id="KFcSjRUvbG6CAz5gOFKa6o">只需把 version.dll 文件放到游戏可执行文件旁边。</p>
+<h5 id="_6" data-page-node-id="FFNIQkQgcTICloElBRe6zC">下载</h5>
+<p data-page-node-id="SPHbfJggOxbFAHreKoiThZ"><a href="https://github.com/cdozdil/vulkan-spoofer/releases" data-page-node-id="BEnbeBY4upGotHGlaAXaqU">vulkan-spoofer</a></p>
+<h2 id="linux" data-page-node-id="HTeIbdpSG1iZDzHqnfXkFM">Linux</h2>
+<p data-page-node-id="gCDXy9dOCUnwProxDqYeWn">在 Linux 上可以直接使用 Wine 和 DXVK 内置的伪装机制。</p>
+<h3 id="directx-vulkan" data-page-node-id="HKFxm1Y062z6d9WAysC2Ep">DirectX 与 Vulkan</h3>
+<p data-page-node-id="ydD7aAQTn2MyilaEvUCvUX">要做 DXGI 和 Vulkan 伪装，只需在游戏可执行文件旁创建一个内容如下的 <code data-page-node-id="QJUPiBzaWNx1lg0HWb7F29">dxvk.conf</code> 文件，或直接从<a href="https://raw.githubusercontent.com/cdozdil/CyberXeSS/imgui-intergration/dxvk.conf" data-page-node-id="WeilNuSdA12GozeExUfyix">这里</a>下载：</p>
+<pre data-page-node-id="wYRkhizu9dsz2cbI1Fao1Q"><code class="language-ini" data-page-node-id="c9gigXdcw3YCJPsGPZdogq">dxgi.customVendorId = 10de
+dxgi.hideAmdGpu = True
+dxgi.hideNvidiaGpu = False
+dxgi.customDeviceId = 2684
+dxgi.customDeviceDesc = &quot;NVIDIA GeForce RTX 4090&quot;
+</code></pre>
+<h3 id="nvapi" data-page-node-id="Yr28yfaNM0pTLbvVM9iw6v">NVAPI</h3>
+<p data-page-node-id="VJu5OQQEXCES7hRqfZB6yC">使用 Proton 时，要伪装 NVAPI，请设置环境变量 <code data-page-node-id="C5DE4DnWLaLcJCqIumZVBr">PROTON_FORCE_NVAPI=1</code>。</p>
+<h2 id="goghor-dlss-unlocker" data-page-node-id="A1XgmEpNd00VCgiqprDSq5">Goghor 的 DLSS Unlocker 模组</h2>
+<p data-page-node-id="1ny9vHS3h9vRaqNUerFNpb">Goghor 为大量游戏制作了 DLSS Unlocker 模组，可以在他的 <a href="https://www.nexusmods.com/spidermanmilesmorales/users/12564231?tab=user+files&amp;BH=0" data-page-node-id="14PWHVshRf0qh2J27x4coD">Nexus 主页</a>找到。
+据我所知，对于《毁灭战士：永恒》，他的模组仍然是开启 DLSS 的唯一方法。</p></section><section id="sec4" data-page-node-id="pEGVsFKswJB40CwByQ7Xig"><div class="doc-src" data-page-node-id="tsjcmIoYzeEidCBJcb85cX">Issues.zh.md · 原文链接见各文件顶部</div><h1 id="_1" data-page-node-id="TFcOf686potMiU0ScnjP5w">已知问题</h1>
+<blockquote data-page-node-id="Li66rlcZXqXbKSGFF68WwO">
+<p data-page-node-id="NJJx8HWyqC1sHDdKkDfw9O">原文：<a href="https://github.com/OptiScaler/OptiScaler/blob/master/Issues.md" data-page-node-id="i5UXY6uLW8AUD3MjjOLy2m">Issues.md</a> | 中文翻译仅供参考</p>
+</blockquote>
+<h2 id="_2" data-page-node-id="pjs5fwMhQkKDya4LvzNkp6">游戏内菜单</h2>
+<p data-page-node-id="ohAhWyT1qEl2UAq7MbD5KY">如果无法打开游戏内菜单，请依次排查：</p>
+<ol data-page-node-id="h09NYSTXIzsMvBNR1hrmTA">
+<li data-page-node-id="byRgTG4lHjFPNAhMcgaJg4">确认你已在游戏选项中启用了 DLSS、XeSS 或 FSR</li>
+<li data-page-node-id="28MaHg8PJtriFrSwsdDHb3">如果使用旧版安装方式，请在<strong data-page-node-id="V0Yrl7ZkIFGHy165zlt0IG">游戏进行中</strong>（有 3D 渲染发生时）尝试打开菜单</li>
+<li data-page-node-id="6VhL6CTnFZC3rJpcNQWxG9">
+<p data-page-node-id="82AEkLGzMkcwTxOsqUNj59">如果你正在使用 RTSS（MSI Afterburner、CapFrameX），请开启 RTSS 的下图所示设置，并尝试更新 RTSS。
+   <img alt="RTSS 设置" src="https://github.com/optiscaler/OptiScaler/assets/35529761/8afb24ac-662a-40ae-a97c-837369e03fc7" data-page-node-id="0NHQS4qidhnIVzRbrrCC31" /></p>
+</li>
+<li data-page-node-id="7rj97cZF0tPRnbuK2FEH2V">
+<p data-page-node-id="Tnxi3DPOPHehDoUlAPiAGp">有些游戏不会释放鼠标控制，这种情况下键盘和手柄操作通常仍然可用。</p>
+</li>
+<li data-page-node-id="up8jkpupONZcSpBcqyedxp">在某些系统与游戏的组合下，打开旧版游戏内菜单可能导致游戏崩溃或画面错乱（尤其在虚幻引擎 5 游戏中）。</li>
+</ol>
+<p data-page-node-id="wUSK9I2K2cim55G8o0imj7"><img alt="Banishers 示例" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/banishers.png" data-page-node-id="3TaoAlzVarBIzqnr9RxDrO" /><br data-page-node-id="psqZfHfGfnI4gBCpqIA2ct"><em data-page-node-id="w1RrBVA8PkDG3HP1WH99ou">《Banishers: Ghosts of New Eden》</em></p>
+<ul data-page-node-id="ZEg0D0E0fxtqX6nsC4Fk2p">
+<li data-page-node-id="BOELnAyiABp5MLwXCFGnA7">修改设置大多数情况没问题，但可能导致崩溃（尤其是切换后端或重新初始化后端时）。</li>
+<li data-page-node-id="Ec4dbWviFGw3X5CPxW67sL">在 Unity 引擎游戏中，旧版游戏内菜单会上下颠倒。</li>
+</ul>
+<p data-page-node-id="THmOU0Sy8j4UVVakv7HqWj"><img alt="画面颠倒示例" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/upsidedown.png" data-page-node-id="FZrlhVfIJgvJT3fyPwQCzn" /><br data-page-node-id="SlB9yWC0Qvebwwh2bW6iVO"><em data-page-node-id="hFtGnzoFwJFmS0uZcaZUmx">《森林之子（Sons of the Forest）》</em></p>
+<h2 id="directx-11-directx12" data-page-node-id="k0JHimgDvrJUUEpp6ROUc1">DirectX 11 借助 DirectX12 的超分方案</h2>
+<p data-page-node-id="pUflKXnH8U5xksjuD2FSAY">这类实现通过后台 DirectX12 设备来使用仅支持 DX12 的超分方案。此方法有约 10%–15% 的性能损失，但能提供更多超分选择。</p>
+<h2 id="exposure-texture" data-page-node-id="U8jL4Zo2iyGaD1IUzNGp3G">曝光纹理（Exposure Texture）</h2>
+<p data-page-node-id="cvLZuVO1LuF6Myk2pJOyoo">有时游戏的曝光纹理格式无法被超分器识别。最常见表现为颜色被"压碎"（尤其在暗部区域）。</p>
+<p data-page-node-id="HSUUd6mIBpc2rGmf4bQcPN"><img alt="曝光问题示例" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/exposure.png" data-page-node-id="amQd0bPLGabgQCcAm3Od4I" /><br data-page-node-id="AkGXVXmCon2gSy1uymAZm6"><em data-page-node-id="BDb5HpOnnz6kdHBR2v3uoJ">《古墓丽影：暗影》</em></p>
+<p data-page-node-id="7zp965FKq3td8kOFRBp1eO">大多数情况下，在 <code data-page-node-id="FSW44DWq0LtaM58zZS6qfR">OptiScaler.ini</code> 中启用 <code data-page-node-id="YFuYMF4B7aG7WezSfg95jK">AutoExposure=true</code>，或在游戏内菜单的 <code data-page-node-id="bs1wZzhYa1hTeBQtKoz0CK">Init Parameters</code> 中选择 <code data-page-node-id="bKh59dOQqCg5r8H6LJtJKa">Auto Exposure</code>，即可解决。</p>
+<h2 id="resource-barriers" data-page-node-id="gcVSKtpFJqXGkVB9j7eHGM">资源屏障（Resource Barriers）</h2>
+<p data-page-node-id="kSlK9BB7rBP9hOYh5BK9qs">已知虚幻引擎的 DLSS 插件会以错误的状态发送资源。通常 OptiScaler 会从 NVSDK 检查引擎信息，并为虚幻引擎游戏自动启用必要的修复，但有些游戏上报的引擎信息不正确。此问题通常表现为屏幕底部出现彩色色块。</p>
+<p data-page-node-id="nA4O2HgeE7oS3tk81VfO4W"><img alt="彩色色块示例" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/christmas.png" data-page-node-id="I7Az5wxNQWUuWPzKFG2RHl" /><br data-page-node-id="JptM2SP4Os1tMYQntqW0Qw"><em data-page-node-id="0L2rs7mTnG3a4J5RjJALIp">《深岩银河（Deep Rock Galactic）》</em></p>
+<p data-page-node-id="r82oovenL8WGZkJsLaFTpt">解决方法：在 <code data-page-node-id="Nriyw6t4pl5QRn706wqsjZ">OptiScaler.ini</code> 中设置 <code data-page-node-id="FPjp08g6w5cXr5qv9GppWu">ColorResourceBarrier=4</code>，或在游戏内菜单的 <code data-page-node-id="dqJEzBnsKzhLY3TTFcBEUa">Resource Barriers (Dx12)</code> 中把 <code data-page-node-id="0rR2oBugjwYMlE6bm5esjD">Color</code> 选为 <code data-page-node-id="dvpI8nLozjAmlUCha6DENe">RENDER_TARGET</code>。</p>
+<h2 id="xess" data-page-node-id="nIDNLFs2482GXYe8IeER0e">XeSS 黑屏/花屏或崩溃</h2>
+<p data-page-node-id="SI29yIXySj3OAT8VxrJ2bg">有用户反馈使用 XeSS 超分后端时出现黑屏/花屏（仅 UI 可见）或崩溃（例如《漫威银河护卫队》）。在某些情况下，下载最新版 <a href="https://github.com/microsoft/DirectXShaderCompiler/releases" data-page-node-id="nmYDxcSIZjhnirYIMXhh71">DirectX Shader Compiler</a>，并把其中 <code data-page-node-id="0TDWE4vUcL6xRPNVDBywjB">bin\x64\</code> 下的 <code data-page-node-id="W0FXEMma0XGDnRUA6zOjQU">dxcompiler.dll</code>、<code data-page-node-id="o13LGTEG511pPmFzayPaMJ">dxil.dll</code> 解压到游戏 exe 旁，即可解决。</p>
+<h2 id="minecraft-rtx" data-page-node-id="L8plSt1suWQPss0gVWtOzE">Minecraft RTX</h2>
+<p data-page-node-id="OF1hDsjHQJAwiBrNdDytTH">XeSS 1.1 与《我的世界 RTX》兼容性最好。但也有反馈称，借助<a href="https://github.com/MCMrARM/mc-w10-version-launcher/releases" data-page-node-id="uOyhtv65KwVCMgBAvHWt98">各种启动器</a>可以使用 1.2 及以上版本。</p>
+<h2 id="linux" data-page-node-id="QA6IBC5JwXWgACsPvYZwIA">Linux 上的着色器编译错误</h2>
+<p data-page-node-id="azvVJd2yOTDBCpfBoCQXEv">如果你在 Linux 上使用 OptiScaler，并且在使用 <code data-page-node-id="2OjTOde7fIecKTtmAjfLCX">RCAS</code>、<code data-page-node-id="d8rwtYnwl7V8kFB2BbD6KH">Reactive Mask Bias</code> 或 <code data-page-node-id="vg3dmPL4ETcPxlg0bzvhaa">Output Scaling</code> 时遇到问题，日志中大概率会出现如下信息：</p>
+<pre data-page-node-id="t4bCKJsphFWxBz1xaI2XuE"><code data-page-node-id="EXmnhkTHPJ5U4tjtMnSJfT">CompileShader error compiling shader : &lt;anonymous&gt;:83:26: E5005: Function &quot;rcp&quot; is not defined.
+</code></pre>
+<p data-page-node-id="UANOPp2lVMX82yKxR8SpUh">解决方法：使用菜单中的 <code data-page-node-id="0qzdi52lap1cdW8oeU741F">Precompiled Shaders</code>（预编译着色器）选项，或通过 <code data-page-node-id="beA8RC9EydZHSAwuysLte2">WineTricks</code> / <code data-page-node-id="L5xCiDEH48NzJW4ARmnyNS">ProtonTricks</code> 安装 <code data-page-node-id="LWDlju5sW0Hmfao4aSCgxE">d3dcompiler_47</code>。OptiScaler 的这些功能使用自定义着色器，并依赖该编译器文件在运行时编译着色器。</p>
+<h2 id="_3" data-page-node-id="8GVBSAQLPEPajrvYSBHs1h">性能问题</h2>
+<ul data-page-node-id="2556gfH4Hd5015FNox9wpH">
+<li data-page-node-id="Wl0TvOjwq8DVM96vaSQ8Kc">总体而言，XeSS 对 GPU 的负担比 FSR 更重，即使在 Intel Arc 显卡上，性能更低也是正常现象。</li>
+<li data-page-node-id="QjxF4hESWz7z7hfwXZHPIZ">由于伪装成 Nvidia 显卡以启用 DLSS，一些游戏会走 Nvidia 优化过的代码路径，可能导致在其他显卡上性能下降。</li>
+</ul>
+<h2 id="display-resolution-motion-vectors" data-page-node-id="6TxCJQOpPRswNkZX3Bj1Jv">显示分辨率运动向量（Display Resolution Motion Vectors）</h2>
+<p data-page-node-id="3u2iFV1RaVyB8lrF8PZDRy">有时游戏会设置错误的 <code data-page-node-id="2abHFgDVBgaDd8VL91VtvD">DisplayResolution</code> 初始化标志，导致过度动态模糊。开启或重置 <code data-page-node-id="zINQ23ImtnrPlKx8aoZUFi">DisplayResolution</code> 有助于解决。</p>
+<p data-page-node-id="LH7AygKJuk00zI75GJDOxv"><img alt="运动向量问题示例" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/mv_wrong.png" data-page-node-id="mBeXVA3kbqUSYVvdlvBAP5" /><br data-page-node-id="7RBi9xJGrb1xZvbP2yGsKH"><em data-page-node-id="jHcaNBXV54r4RmRg7UYbUA">《深岩银河（Deep Rock Galactic）》</em></p>
+<h2 id="_4" data-page-node-id="WDweRYpwWHDj4jtRsZQ9vD">画面错乱与崩溃</h2>
+<p data-page-node-id="KKUmaYFpAAPEvp5IxjmJ6m">如前所述，伪装 Nvidia 显卡可能让游戏走上特殊代码路径，造成画面错乱。如有可能，请禁用伪装，在这些情况下改用 FSR 或 XeSS 输入。</p>
+<p data-page-node-id="xNJ5W7uGebQDenzulshiyn"><img alt="画面错乱示例" src="https://raw.githubusercontent.com/OptiScaler/OptiScaler/master/images/talos.png" data-page-node-id="F4y2IFh35KQCRb3NNbPwO6" /><br data-page-node-id="hNGOWCWMVoGqAwa5RvtM1p"><em data-page-node-id="n3euJ1DvHZzhQs5ZlBzXOa">《塔罗斯的法则 2（The Talos Principle 2）》</em></p>
+<ul data-page-node-id="FlVmEwfgSTIjUiVYpqE8aj">
+<li data-page-node-id="pp2Rajg9T0zgZTY4qgpt1f">还有崩溃问题，尤其是开启光线追踪时。</li>
+</ul></section>
+  </main>
+</div>
+<script>
+  const links = [...document.querySelectorAll('aside nav a[href^="#"]')];
+  const secs = links.map(a => document.querySelector(a.getAttribute('href')));
+  addEventListener('scroll', () => {
+    let idx = 0;
+    secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 140) idx = i; });
+    links.forEach((a, i) => a.classList.toggle('active', i === idx));
+  });
+</script>
+</body>
+</html>
