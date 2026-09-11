@@ -204,6 +204,19 @@ jobs:
           Copy-Item 'overlay\zh-CN\源码与许可说明.txt' $pkg -Force
           Copy-Item 'overlay\zh-CN\LICENSE-GPLv3.txt' $pkg -Force
 
+          # 一键卸载器：入口 bat + 实际逻辑 ps1，两个都必须进包
+          foreach ($u in @('卸载 OptiScaler.bat', 'uninstall-OptiScaler.ps1')) {
+            $src = Join-Path 'overlay' $u
+            if (-not (Test-Path -LiteralPath $src)) { throw "覆盖层里缺少卸载器文件：$u" }
+            Copy-Item -LiteralPath $src -Destination (Join-Path $pkg $u) -Force
+          }
+          $unPs = [Text.Encoding]::UTF8.GetString(
+                     [IO.File]::ReadAllBytes((Join-Path $pkg 'uninstall-OptiScaler.ps1')))
+          foreach ($p in @('一键卸载', '确认属于 OptiScaler', 'ReShade')) {
+            if (-not $unPs.Contains($p)) { throw "卸载脚本中未找到「$p」" }
+          }
+          Write-Host '  [ok] 卸载器已放入运行包并通过探针检查'
+
           # 上游 PostBuildEvent 用 `copy NUL` 生成英文名的解压提示文件。
           # 这里改成中文名：必须用 PowerShell——英文版 runner 的 cmd 会按 CP437
           # 解释命令行里的中文，导致文件名变成乱码。改名失败不影响使用，故只告警。
