@@ -34,8 +34,10 @@ concurrency:
 
 env:
   UPSTREAM_REPO: https://github.com/OptiScaler/OptiScaler.git
-  # 汉化所基于的上游提交（与本地汉化时的版本一致，保证可编译）
-  UPSTREAM_SHA: d36a078f
+  # 上游锁定版本不写在这里，而是放在 .github/upstream-commit.txt——
+  # 那个文件是「唯一事实来源」，check-upstream.yml 会自动更新它。
+  # 注意上游的默认分支是 master，且 Release 长期滞后于 master（v0.9.4 vs v10），
+  # 所以跟的是 master 的提交，不是 Release 标签。
   BUILD_CONFIG: Release
   BUILD_PLATFORM: x64
 
@@ -49,6 +51,18 @@ jobs:
         uses: actions/checkout@v6
         with:
           path: overlay
+
+      - name: 读取上游锁定版本
+        shell: pwsh
+        run: |
+          # 锁定版本放在文件里而不是写死在 workflow 中，这样 check-upstream.yml
+          # 可以在检测到上游更新时自动改这个文件，实现「上游更新 → 自动跟进」。
+          $pinFile = 'overlay\.github\upstream-commit.txt'
+          if (-not (Test-Path $pinFile)) { throw "找不到 $pinFile" }
+          $sha = (Get-Content $pinFile -Raw).Trim()
+          if ($sha -notmatch '^[0-9a-f]{7,40}$') { throw "upstream-commit.txt 内容不像提交号：'$sha'" }
+          Write-Host "上游锁定版本：$sha"
+          "UPSTREAM_SHA=$sha" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: 克隆上游源码并切到指定提交
         shell: pwsh
@@ -230,6 +244,19 @@ jobs:
           7z a -tzip -mx=5 'OptiScaler-CN-source.zip' '.\overlay\*' -xr'!.git' | Out-Null
           Get-Item 'OptiScaler-CN-source.zip' | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,2)}}
 
+      - name: 生成汉化补丁（供下次上游更新合并用）
+        shell: pwsh
+        working-directory: base
+        run: |
+          # 这份补丁描述「上游锁定版本 -> 汉化版」的全部差异。
+          # 上游更新后把它应用到新版本上（git apply --reject），能自动合并大部分改动，
+          # 只剩真正冲突的片段写进 .rej 文件留给人。完整流程见《更新上游.md》。
+          # 用 --output 而不是 shell 重定向：后者会把换行改成 CRLF，补丁就没法 apply 了。
+          # 字体子集刻意不含（1.4MB 的生成物），用 tools/make_font_subset.py 重新生成即可。
+          git diff --no-color --output=../localization.patch -- . ':(exclude)OptiScaler/menu/font/NotoSansSC_Subset.h'
+          if ($LASTEXITCODE -ne 0) { throw "生成补丁失败" }
+          Get-Item ..\localization.patch | Select-Object Name, @{n='KB';e={[math]::Round($_.Length/1KB,1)}}
+
       - name: 上传运行包
         uses: actions/upload-artifact@v7
         with:
@@ -281,7 +308,7 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "创建 Release 失败（退出码 $LASTEXITCODE）" }
           }
 
-          gh release upload $tag OptiScaler-CN.zip OptiScaler-CN-source.zip --clobber
+          gh release upload $tag OptiScaler-CN.zip OptiScaler-CN-source.zip localization.patch --clobber
           if ($LASTEXITCODE -ne 0) { throw "上传附件失败（退出码 $LASTEXITCODE）" }
 
           Write-Host '=== 发布完成，下载地址 ==='

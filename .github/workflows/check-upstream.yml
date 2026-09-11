@@ -1,0 +1,224 @@
+name: 检查上游更新
+
+# 上游（OptiScaler/OptiScaler）更新后，本仓库怎么跟上：
+#
+#   每天定时查一次上游 master 的最新提交，与 .github/upstream-commit.txt 里锁定的版本比较：
+#     · 一样              → 什么都不做
+#     · 不一样，且上游改的文件与我们改过的文件「没有重叠」
+#                         → 安全，自动把锁定版本改成新的，并触发一次构建
+#     · 不一样，且有重叠  → 不能自动合并（我们的覆盖层是整文件替换，
+#                           直接盖上去会把上游的改动吞掉），改为开 Issue 通知人工处理
+#
+# 为什么重叠的情况必须人工处理：
+#   覆盖层模式下，menu_common.cpp / OptiScaler.ini 这些文件是「整份替换」上游版本的。
+#   如果上游恰好也改了这些文件，自动跟进的成品会丢掉上游的修复。
+#   具体处理办法见仓库根目录的《更新上游.md》。
+
+on:
+  schedule:
+    # 每天 03:00 UTC（北京时间 11:00）。GitHub 的定时任务在高峰期可能延迟几分钟到几十分钟。
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '只检测不修改（用于验证流程）'
+        type: boolean
+        default: false
+      override_pin:
+        description: '临时指定一个「锁定版本」来测试检测逻辑（留空则读文件）'
+        type: string
+        default: ''
+
+permissions:
+  contents: write   # 更新 .github/upstream-commit.txt 并提交
+  actions: write    # 用 gh workflow run 触发构建
+  issues: write     # 需要人工处理时开 Issue
+
+# 与构建串行，避免「刚更新锁定版本就撞上一次正在跑的构建」
+concurrency:
+  group: check-upstream
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_SLUG: OptiScaler/OptiScaler     # owner/repo，给 gh api 用
+  UPSTREAM_BRANCH: master                  # 上游默认分支是 master（Release 长期滞后，不跟 Release）
+  ISSUE_MARK: upstream-sync                # 写进 Issue 标题的稳定标记，用于去重
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 检出本仓库
+        uses: actions/checkout@v6
+        with:
+          path: overlay
+          ref: main
+
+      - name: 对比上游版本
+        id: probe
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          DRY: ${{ inputs.dry_run }}
+          OVERRIDE: ${{ inputs.override_pin }}
+        run: |
+          $dry = ($env:DRY -eq 'true')
+
+          $pin = (Get-Content 'overlay/.github/upstream-commit.txt' -Raw).Trim()
+          if ($env:OVERRIDE) {
+            $pin = $env:OVERRIDE.Trim()
+            Write-Host "[测试] 锁定版本被临时覆盖为 $pin"
+          }
+
+          $head = gh api "repos/$env:UPSTREAM_SLUG/commits/$env:UPSTREAM_BRANCH" --jq .sha
+          if ($LASTEXITCODE -ne 0) { throw "查询上游最新提交失败" }
+
+          Write-Host "锁定版本：$pin"
+          Write-Host "上游最新：$head"
+
+          if ($pin -eq $head) {
+            Write-Host "上游没有新提交，无需处理。"
+            "SKIP=1" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            exit 0
+          }
+
+          # 上游在「锁定版本 → 最新」之间改了哪些文件
+          $raw = gh api "repos/$env:UPSTREAM_SLUG/compare/$pin...$head"
+          if ($LASTEXITCODE -ne 0) {
+            # 常见原因：上游 force push / rebase，导致锁定版本已不存在
+            Write-Host "::warning::compare 调用失败，锁定的提交可能已不存在（上游 force push？）"
+            "FORCE_FAILED=1" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            exit 0
+          }
+          $cmp = $raw | ConvertFrom-Json
+          $changed = @($cmp.files | ForEach-Object { $_.filename })
+          $commitCount = @($cmp.commits).Count
+          Write-Host "上游新增 $commitCount 个提交，改动 $($changed.Count) 个文件"
+          if ($changed.Count -ge 300) {
+            Write-Host "::warning::compare 最多返回 300 个文件，列表可能被截断"
+          }
+
+          # 我们的覆盖层文件（= 我们改过的文件），用于判断是否与上游改动重叠
+          $base = (Resolve-Path overlay).Path
+          $ours = Get-ChildItem -Recurse -File -Force overlay |
+                  Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' } |
+                  ForEach-Object { $_.FullName.Substring($base.Length + 1).Replace('\', '/') }
+          Write-Host "覆盖层共 $($ours.Count) 个文件"
+
+          $overlap = @($changed | Where-Object { $ours -contains $_ })
+
+          $head7 = $head.Substring(0, 7)
+          $pin7 = $pin.Substring(0, 7)
+          "NEW_SHA=$head" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "NEW_SHA7=$head7" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "OLD_SHA7=$pin7" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "OVERLAP=$($overlap.Count)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "CHANGED=$($changed.Count)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "COMMITS=$commitCount" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+          if ($dry) {
+            Write-Host "[干跑] 检测到更新；按流程本应进入「自动跟进」或「开 Issue」分支，本次不修改任何东西。"
+          }
+          ($cmp.files | ForEach-Object { $_.filename }) -join "`n" |
+            Out-File -FilePath 'changed-files.txt' -Encoding utf8
+          ($overlap) -join "`n" | Out-File -FilePath 'overlap-files.txt' -Encoding utf8
+
+      - name: 无重叠，自动跟进上游
+        if: env.SKIP != '1' && env.FORCE_FAILED != '1' && env.OVERLAP == '0'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          DRY: ${{ inputs.dry_run }}
+        run: |
+          if ($env:DRY -eq 'true') {
+            Write-Host "[干跑] 本可自动更新锁定版本 $env:OLD_SHA7 -> $env:NEW_SHA7"
+            exit 0
+          }
+
+          Set-Content -Path 'overlay/.github/upstream-commit.txt' -Value "$env:NEW_SHA" -NoNewline
+          Add-Content -Path 'overlay/.github/upstream-commit.txt' -Value ""
+
+          Push-Location overlay
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/upstream-commit.txt
+          git commit -m "chore: 跟进上游更新 $env:OLD_SHA7 -> $env:NEW_SHA7（$env:CHANGED 个文件改动，与汉化无重叠）"
+          if ($LASTEXITCODE -ne 0) { Pop-Location; throw "提交失败" }
+          git push origin HEAD:main
+          if ($LASTEXITCODE -ne 0) { Pop-Location; throw "推送失败" }
+          Pop-Location
+
+          # 关键：用 GITHUB_TOKEN 推送不会触发其它 workflow（GitHub 防止递归触发），
+          # 所以必须显式触发一次构建。
+          gh workflow run build-cn.yml --ref main
+          if ($LASTEXITCODE -ne 0) { throw "触发构建失败" }
+          Write-Host "已更新锁定版本并触发构建：$env:OLD_SHA7 -> $env:NEW_SHA7"
+
+      - name: 有重叠，开 Issue 请人工处理
+        if: env.SKIP != '1' && env.FORCE_FAILED != '1' && env.OVERLAP != '0'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          DRY: ${{ inputs.dry_run }}
+        run: |
+          $overlap = @(Get-Content 'overlap-files.txt' -ErrorAction SilentlyContinue | Where-Object { $_ })
+          # 注意：PowerShell 的反引号是转义符，正文里不要用 Markdown 反引号包变量
+          $body = @"
+          ## 上游有更新，但改动到了我们汉化过的文件
+
+          | 项 | 值 |
+          | --- | --- |
+          | 当前锁定版本 | $env:OLD_SHA7 |
+          | 上游最新版本 | $env:NEW_SHA7 |
+          | 上游新增提交 | $env:COMMITS 个 |
+          | 上游改动文件 | $env:CHANGED 个 |
+          | **与汉化重叠的文件** | **$env:OVERLAP 个** |
+
+          ### 重叠文件（这些必须人工处理）
+
+          ```
+          $($overlap -join "`n")
+          ```
+
+          ### 为什么不能自动合并
+
+          本仓库是「覆盖层」模式：这些文件是整份替换上游版本的。如果直接自动跟进，
+          上游对这些文件的修复会被我们的汉化版本静默覆盖掉，成品会缺上游的新内容。
+
+          ### 怎么处理
+
+          见仓库根目录的《更新上游.md》。概要：
+
+          1. 本地把上游克隆到新版本并检出 $env:NEW_SHA7
+          2. 用「本地化工具」下的脚本把汉化重新施加到新版本上
+             （INI 注释、提示弹窗、控件标签、Linux 安装脚本是字符串替换式，直接 --apply 重跑即可；
+             菜单文案是偏移量替换式，需要逐条过一遍）
+          3. 重新生成中文字体子集（tools/make_font_subset.py）
+          4. 把 .github/upstream-commit.txt 改成新版本并提交
+
+          本 Issue 由 check-upstream.yml 自动创建。处理完成后关闭即可；
+          之后若再出现同样的重叠，会在这条 Issue 下追加评论，不会重复开新的。
+          "@
+
+          if ($env:DRY -eq 'true') {
+            Write-Host "[干跑] 本应创建/更新 Issue。正文预览："
+            Write-Host $body
+            exit 0
+          }
+
+          $existing = gh issue list --state open --search "$env:ISSUE_MARK in:title" --json number --jq '.[0].number'
+          if ($LASTEXITCODE -ne 0) { throw "查询已有 Issue 失败" }
+
+          if ($existing) {
+            Write-Host "已存在 Issue #$existing，追加评论"
+            gh issue comment $existing --body $body
+            if ($LASTEXITCODE -ne 0) { throw "追加评论失败" }
+          } else {
+            gh issue create --title "[$env:ISSUE_MARK] 上游有更新且与汉化文件重叠，需人工处理" --body $body
+            if ($LASTEXITCODE -ne 0) { throw "创建 Issue 失败" }
+          }
