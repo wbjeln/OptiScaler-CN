@@ -2134,7 +2134,7 @@ void MenuCommon::RenderPerformanceOverlay(RenderMenuContext& ctx)
                     if (fg != nullptr)
                         localFrameCount = fg->FrameCount();
 
-                    ImGui::Text("FGId: %llu, RfxId: %llu", localFrameCount, state.reflexFrameId);
+                    ImGui::Text("帧生成Id：%llu, ReflexId：%llu", localFrameCount, state.reflexFrameId);
                     ImGui::Text("低延迟时序，整帧：%.1fms", rangeInNs / 1000.0);
 
                     const auto maxWidth =
@@ -2194,7 +2194,7 @@ void MenuCommon::RenderPerformanceOverlay(RenderMenuContext& ctx)
                     if (fg != nullptr)
                         localFrameCount = fg->FrameCount();
 
-                    ImGui::Text("FGId: %llu, RfxId: %llu", localFrameCount, state.reflexFrameId);
+                    ImGui::Text("帧生成Id：%llu, ReflexId：%llu", localFrameCount, state.reflexFrameId);
                     ImGui::Text("Reflex 时序，整帧：%.1fms", rangeInNs / 1000.0);
 
                     const auto maxWidth =
@@ -2382,16 +2382,16 @@ void MenuCommon::RenderMainMenuHeaderMessages(RenderMenuContext& ctx)
                 ImGui::Text("nvngx 替代：%s", state.nvngxReplacement.has_value() ? "存在" : "不存在");
             }
 
-            ImGui::Text("libxess: %s",
+            ImGui::Text("libxess：%s",
                         (state.libxessExists || XeSSProxy::Module() != nullptr) ? "存在" : "不存在");
 
             ImGui::Text("FSR 挂钩：%s", state.fsrHooks ? "存在" : "不存在");
             ImGui::SameLine(0.0f, 16.0f);
-            ImGui::Text("FSR 3.1: %s", FfxApiProxy::Dx12Module() != nullptr ? "存在" : "不存在");
+            ImGui::Text("FSR 3.1：%s", FfxApiProxy::Dx12Module() != nullptr ? "存在" : "不存在");
             ImGui::SameLine(0.0f, 16.0f);
-            ImGui::Text("FSR 3.1 SR: %s", FfxApiProxy::Dx12Module_SR() != nullptr ? "存在" : "不存在");
+            ImGui::Text("FSR 3.1 超分：%s", FfxApiProxy::Dx12Module_SR() != nullptr ? "存在" : "不存在");
             ImGui::SameLine(0.0f, 16.0f);
-            ImGui::Text("FSR 3.1 FG: %s", FfxApiProxy::Dx12Module_FG() != nullptr ? "存在" : "不存在");
+            ImGui::Text("FSR 3.1 帧生成：%s", FfxApiProxy::Dx12Module_FG() != nullptr ? "存在" : "不存在");
 
             ImGui::Spacing();
         }
@@ -3720,7 +3720,7 @@ void MenuCommon::RenderFrameGenerationRuntimeSettings(RenderMenuContext& ctx)
             }
 
             bool fgActive = config->FGEnabled.value_or_default();
-            if (ImGui::Checkbox("Active##2", &fgActive))
+            if (ImGui::Checkbox("已启用##2", &fgActive))
             {
                 config->FGEnabled = fgActive;
                 LOG_DEBUG("FGEnabled set FGEnabled: {}", fgActive);
@@ -3997,7 +3997,7 @@ void MenuCommon::RenderFrameGenerationRuntimeSettings(RenderMenuContext& ctx)
         ImGui::BeginDisabled(!correctMVs || cantActivate);
 
         bool fgActive = config->FGEnabled.value_or_default();
-        if (ImGui::Checkbox("Active##3", &fgActive))
+        if (ImGui::Checkbox("已启用##3", &fgActive))
         {
             config->FGEnabled = fgActive;
             LOG_DEBUG("Enabled set FGEnabled: {}", fgActive);
@@ -4151,7 +4151,7 @@ void MenuCommon::RenderFrameGenerationRuntimeSettings(RenderMenuContext& ctx)
         ImGui::SameLine();
         if (auto count = state.dlssgDetectedInterpolationCount; count > 0)
         {
-            ImGui::TextColored(toneMapColor(ImVec4(0.f, 1.f, 0.25f, 1.f)), std::format("ON {}x", count + 1).c_str());
+            ImGui::TextColored(toneMapColor(ImVec4(0.f, 1.f, 0.25f, 1.f)), std::format("开启 {}x", count + 1).c_str());
         }
         else
         {
@@ -4159,7 +4159,7 @@ void MenuCommon::RenderFrameGenerationRuntimeSettings(RenderMenuContext& ctx)
         }
 
         bool fgActive = config->FGEnabled.value_or_default();
-        if (ImGui::Checkbox("Active##4", &fgActive))
+        if (ImGui::Checkbox("已启用##4", &fgActive))
         {
             config->FGEnabled = fgActive;
             LOG_DEBUG("Enabled set FGEnabled: {}", fgActive);
@@ -4607,7 +4607,7 @@ void MenuCommon::RenderFrameGenerationRuntimeSettings(RenderMenuContext& ctx)
                 if (auto count = state.dlssgDetectedInterpolationCount; count > 0)
                 {
                     ImGui::TextColored(toneMapColor(ImVec4(0.f, 1.f, 0.25f, 1.f)),
-                                       std::format("ON {}x", count + 1).c_str());
+                                       std::format("开启 {}x", count + 1).c_str());
                 }
                 else
                 {
@@ -6376,7 +6376,7 @@ void MenuCommon::RenderThemeSettings(RenderMenuContext& ctx)
                                  config->MenuAccentColorG.value_or_default(),
                                  config->MenuAccentColorB.value_or_default() };
 
-        if (ImGui::ColorEdit3("Custom Accent Color", accentColor))
+        if (ImGui::ColorEdit3("自定义强调色", accentColor))
         {
             config->MenuAccentColorR = accentColor[0];
             config->MenuAccentColorG = accentColor[1];
@@ -6570,7 +6570,7 @@ void MenuCommon::RenderThemeSettings(RenderMenuContext& ctx)
         float bgColor[3] = { config->MenuBGColorR.value_or_default(), config->MenuBGColorG.value_or_default(),
                              config->MenuBGColorB.value_or_default() };
 
-        if (ImGui::ColorEdit3("Custom BG Colour", bgColor))
+        if (ImGui::ColorEdit3("自定义背景色", bgColor))
         {
             config->MenuBGColorR = bgColor[0];
             config->MenuBGColorG = bgColor[1];
@@ -7516,7 +7516,7 @@ void MenuCommon::RenderHudlessResourcesWindow(RenderMenuContext& ctx, ImGuiWindo
 
                     ImGui::TableSetColumnIndex(0);
 
-                    ImGui::Text("%08x, %s->%s, Count: %llu, %s", (size_t) it->first,
+                    ImGui::Text("%08x, %s->%s, 计数：%llu, %s", (size_t) it->first,
                                 GetSourceString(it->second.captureInfo & 0xFF).c_str(),
                                 GetDispatchString(it->second.captureInfo & 0xFF00).c_str(), it->second.usageCount,
                                 it->second.enabled ? "使用中" : "闲置");
