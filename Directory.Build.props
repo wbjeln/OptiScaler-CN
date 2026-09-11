@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  汉化改动说明：
+  源码里的界面文案现在是 UTF-8 编码的中文。MSVC 默认会按系统 ANSI 代码页（简体中文系统为 GBK、
+  英文系统为 CP1252）解释源文件，并在生成可执行字符集时再次转换，结果是中文变成乱码或触发
+  C4566 警告，ImGui 收到非 UTF-8 字节后显示为方块。
+  /utf-8 同时把源字符集与执行字符集指定为 UTF-8，与 ImGui 的 UTF-8 文本约定一致。
+
+  放在仓库根目录的 Directory.Build.props 会被 MSBuild 自动导入，对所有配置与平台生效。
+-->
+<Project>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>
