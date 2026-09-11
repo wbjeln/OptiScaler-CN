@@ -250,19 +250,29 @@ jobs:
           # 必须显式告诉 gh 操作哪个仓库，否则它会因「找不到 git 仓库」失败
           GH_REPO: ${{ github.repository }}
         run: |
+          $ErrorActionPreference = 'Continue'
           $tag = 'v10.0.0-cn'
           $title = 'OptiScaler 简体中文版 v10.0.0-cn'
 
+          # 注意：覆盖层被检出到 overlay/ 子目录，所以发布说明在 overlay/.github/ 下，
+          # 不是当前工作目录的 .github/ 下。
+          $notes = Join-Path $env:GITHUB_WORKSPACE 'overlay\.github\release-notes.md'
+          if (-not (Test-Path $notes)) { throw "找不到发布说明文件：$notes" }
+
+          # 逐个检查退出码并立即终止：gh 的报错信息是给人看的，脚本不能靠它判断成败
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "Release $tag 已存在，更新说明并覆盖附件"
-            gh release edit $tag --title $title --notes-file .github/release-notes.md
+            Write-Host "Release $tag 已存在，更新标题与说明"
+            gh release edit $tag --title $title --notes-file $notes
+            if ($LASTEXITCODE -ne 0) { throw "更新 Release 失败（退出码 $LASTEXITCODE）" }
           } else {
             Write-Host "创建 Release $tag"
-            gh release create $tag --title $title --notes-file .github/release-notes.md --latest
+            gh release create $tag --title $title --notes-file $notes --latest
+            if ($LASTEXITCODE -ne 0) { throw "创建 Release 失败（退出码 $LASTEXITCODE）" }
           }
 
           gh release upload $tag OptiScaler-CN.zip OptiScaler-CN-source.zip --clobber
+          if ($LASTEXITCODE -ne 0) { throw "上传附件失败（退出码 $LASTEXITCODE）" }
 
           Write-Host '=== 发布完成，下载地址 ==='
           Write-Host "https://github.com/$env:GITHUB_REPOSITORY/releases/tag/$tag"
